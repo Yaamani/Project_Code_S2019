@@ -62,9 +62,6 @@ bool MyRegion::NormalOrdersRemoveLast(Order *& o)
 
 void MyRegion::addMyOrdersToDrawOrdersArr(GUI * pGUI)
 {
-	Order * mark = NULL;
-	Order * o = NULL;
-
 	PrioritizedNode<Order*>* frozenVipCurrent = frozen_VIP.getFront();
 	while (frozenVipCurrent) {
 		pGUI->AddOrderForDrawing(frozenVipCurrent->getItem());
@@ -76,18 +73,14 @@ void MyRegion::addMyOrdersToDrawOrdersArr(GUI * pGUI)
 	///////////////////////////////////////////////////
 	///////////////////////////////////////////////////
 
-	if (normal.RemoveLast(mark)) {
-
-		pGUI->AddOrderForDrawing(mark);
-		normal.insertBeg(mark);
-		normal.RemoveLast(o);
-		if (mark == o) normal.insertBeg(mark);
-
-		while (o != mark) {
-			pGUI->AddOrderForDrawing(o);
-			normal.insertBeg(o);
-			normal.RemoveLast(o);
-		}
+	Order** normalOrdersInReverseOrder = new Order*[normal.getSize()];
+	Node<Order*>* normalCurrent = normal.GetHead();
+	for (int i = 0; normalCurrent; i++) {
+		normalOrdersInReverseOrder[i] = normalCurrent->getItem();
+		normalCurrent = normalCurrent->getNext();
+	}
+	for (int i = normal.getSize() - 1; i >= 0; i--) {
+		pGUI->AddOrderForDrawing(normalOrdersInReverseOrder[i]);
 	}
 }
 
@@ -188,11 +181,16 @@ bool MyRegion::ExcludeNormalOrderFromNormalListByID(int ID, Order *& o)
 	if (index > 0 && index < normal.getSize() - 1) {
 		normalList[index - 1]->setNext(normalList[index + 1]);
 		delete normalList[index];
+		normal.deletionDoneOutside();
 	}
 	else if (index == 0)
 		normal.Remove(0);
-	else
+	else {
 		normalList[index - 1]->setNext(NULL);
+		delete normalList[index];
+		normal.deletionDoneOutside();
+	}
+
 }
 
 void MyRegion::printContents()

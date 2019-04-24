@@ -26,6 +26,7 @@ public:
 	int getSize();
 	Node<T>* GetHead();
 	Node<T>** getArray();
+	void deletionDoneOutside();
 
 	bool isEmpty();
 
@@ -177,6 +178,12 @@ Node<T>** List<T>::getArray()
 	}
 
 	return arr;
+}
+
+template<typename T>
+void List<T>::deletionDoneOutside()
+{
+	size--;
 }
 
 template<typename T>
