@@ -24,9 +24,11 @@ Order::Order(int ID, ORD_TYPE r_Type, MyRegion * r_region, int ArrTime, int dist
 	else if (r_Type == TYPE_VIP) {
 		double weight = calculateVipWeight();
 		r_region->enqueueToFrozen_VIP(this, weight);
+		r_region->enqueueToVIP(this, weight);
 	}
 	else {
 		r_region->enqueueToFrozen_VIP(this, -DBL_MAX);
+		r_region->enqueueTofrozen(this);
 	}
 }
 
@@ -58,6 +60,11 @@ void Order::SetDistance(int d)
 int Order::GetDistance() const
 {
 	return Distance;
+}
+
+void Order::setDelivered(bool i)
+{
+	delivered = i;
 }
 
 bool Order::isDelivered()

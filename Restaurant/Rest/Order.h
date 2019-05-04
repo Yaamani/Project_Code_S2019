@@ -45,7 +45,7 @@ public:
 	//
 	// TODO: Add More Member Functions As Needed
 	//
-
+	void setDelivered(bool i );
 	bool isDelivered();
 
 	void SetMoney(int m);

@@ -20,6 +20,16 @@ void MyRegion::enqueueToFrozen_VIP(Order * order, double weight)
 	frozen_VIP.enqueue(order, weight); //according to weight
 }
 
+void MyRegion::enqueueToVIP(Order * order, double weight)
+{
+	VIP.enqueue(order,weight);
+}
+
+void MyRegion::enqueueTofrozen(Order * order)
+{
+	frozen.enqueue(order);
+}
+
 void MyRegion::enqueueToFastMotorcycles(Motorcycle * order)
 {
 	fastMotorcycles.enqueue(order);
@@ -91,30 +101,12 @@ int MyRegion::getNormalOrdersCount()
 
 int MyRegion::getFrozenOrdersCount()
 {
-	int count = 0;
-
-	Node<Order*>* current = frozen_VIP.getFront();
-	while (current) {
-		if (current->getItem()->GetType() == TYPE_FROZ) count++;
-		
-			current = current->getNext();
-	}
-
-	return count;
+	return frozen.getSize();
 }
 
 int MyRegion::getVipOrdersCount()
 {
-	int count = 0;
-
-	Node<Order*>* current = frozen_VIP.getFront();
-	while (current) {
-		if (current->getItem()->GetType() == TYPE_VIP) count++;
-
-		current = current->getNext();
-	}
-
-	return count;
+	return VIP.getSize();
 }
 
 int MyRegion::getNormalMotorcyclesCount()
@@ -215,6 +207,112 @@ void MyRegion::printContents()
 	Motorcycle::printIds(fastMotorcycles.getFront());
 	
 	std::cout << " __________________________________________________________ \n";
+}
+
+void MyRegion::doAssigningStuff(int currentTime)
+{
+	assignMotorcycles(currentTime);
+	getReturnedMotorcycles(currentTime);
+}
+
+void MyRegion::assignMotorcycles(int currentTime)
+{
+	while (!VIP.isEmpty()&&(!fastMotorcycles.isEmpty()||!frozenMotorcycles.isEmpty()||!normalMotorcycles.isEmpty())) {
+		Order * currentOrder;
+		VIP.dequeue(currentOrder);
+		Motorcycle * mc = NULL;
+		if (fastMotorcycles.dequeue(mc)) {
+			currentOrder->SetWaitTime(currentTime-currentOrder->GetArrTime());
+			currentOrder->SetServTime(ceil(currentOrder->GetDistance() / mc->getSpeed()));
+			mc->setOrder(currentOrder);
+			int returnTime = currentTime + ceil(2 * currentOrder->GetDistance() / mc->getSpeed());
+			mc->setReturnTime(returnTime);
+			InServiceMotorcycles.enqueue(mc,1/returnTime);
+			continue;
+		}
+		if (frozenMotorcycles.dequeue(mc)) {
+			currentOrder->SetWaitTime(currentTime - currentOrder->GetArrTime());
+			currentOrder->SetServTime(ceil(currentOrder->GetDistance() / mc->getSpeed()));
+			mc->setOrder(currentOrder);
+			int returnTime = currentTime + ceil(2 * currentOrder->GetDistance() / mc->getSpeed());
+			mc->setReturnTime(returnTime);
+			InServiceMotorcycles.enqueue(mc, 1 / returnTime);
+			continue;
+		}
+		if (normalMotorcycles.dequeue(mc)) {
+			currentOrder->SetWaitTime(currentTime - currentOrder->GetArrTime());
+			currentOrder->SetServTime(ceil(currentOrder->GetDistance() / mc->getSpeed()));
+			mc->setOrder(currentOrder);
+			int returnTime = currentTime + ceil(2 * currentOrder->GetDistance() / mc->getSpeed());
+			mc->setReturnTime(returnTime);
+			InServiceMotorcycles.enqueue(mc, 1 / returnTime);
+			continue;
+		}
+	}
+
+	while (!frozen.isEmpty() && !frozenMotorcycles.isEmpty()) {
+		Order * currentOrder;
+		Motorcycle * mc = NULL;
+
+		frozen.dequeue(currentOrder);
+		frozenMotorcycles.dequeue(mc);
+		
+		currentOrder->SetWaitTime(currentTime - currentOrder->GetArrTime());
+		currentOrder->SetServTime(ceil(currentOrder->GetDistance() / mc->getSpeed()));
+		mc->setOrder(currentOrder);
+		
+		int returnTime = currentTime + ceil(2 * currentOrder->GetDistance() / mc->getSpeed());
+		mc->setReturnTime(returnTime);
+		
+		InServiceMotorcycles.enqueue(mc, 1 / returnTime);	
+	}
+
+	while (!normal.isEmpty() && !normalMotorcycles.isEmpty()) {
+		Order * currentOrder;
+		Motorcycle * mc = NULL;
+		
+		normal.RemoveLast(currentOrder);
+		normalMotorcycles.dequeue(mc);
+		
+		currentOrder->SetWaitTime(currentTime - currentOrder->GetArrTime());
+		currentOrder->SetServTime(ceil(currentOrder->GetDistance() / mc->getSpeed()));
+		mc->setOrder(currentOrder);
+		
+		int returnTime = currentTime + ceil(2 * currentOrder->GetDistance() / mc->getSpeed());
+		mc->setReturnTime(returnTime);
+
+		InServiceMotorcycles.enqueue(mc, 1 / returnTime);
+	}
+}
+
+void MyRegion::getReturnedMotorcycles(int currentTime)
+{
+	Restaurant * R_ptr;
+	Motorcycle * mc;
+	InServiceMotorcycles.peekFront(mc);
+	if (InServiceMotorcycles.isEmpty())
+		return;
+	
+	while (!InServiceMotorcycles.isEmpty()&&mc->getReturnTime()<=currentTime) {
+		InServiceMotorcycles.dequeue(mc);
+		Order * deliveredOrder;
+		deliveredOrder = mc->getOrder();
+		deliveredOrder->setDelivered(TRUE);
+		R_ptr->addToDelivered(deliveredOrder);
+		mc->setOrder(NULL);
+		switch (mc->getMotorCycleType()) {
+		case TYPE_NRM:
+			normalMotorcycles.enqueue(mc);
+			break;
+		case TYPE_FROZ:
+			frozenMotorcycles.enqueue(mc);
+			break;
+		case TYPE_VIP:
+			fastMotorcycles.enqueue(mc);
+			break;
+		}
+		InServiceMotorcycles.peekFront(mc);
+	}
 }
 
 

@@ -41,8 +41,8 @@ private:
 	MyRegion* regionC;
 	MyRegion* regionD;
 
-	Queue<Order*> deliveredOrders;
-
+	PriorityQueue<Order*> deliveredOrders;
+	
 	bool loadFiles(string path);
 	void fillOrdersGUI();
 
@@ -77,6 +77,7 @@ public:
 	void Interactive();
 	MyRegion* GetMyRegion(int i);
 
+	void addToDelivered(Order* delivered);
 
 };
 

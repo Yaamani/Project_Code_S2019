@@ -13,8 +13,8 @@ class Motorcycle
 	//int speed;		//meters it can move in one clock tick (in one timestep)
 	MyRegion* region;	//region of the motorcycle
 	STATUS	status;	//idle or in-service
-
 	Order* currentInServiceOrder;
+	int returnTime;
 
 protected:
 	static int normalSpeed;
@@ -23,14 +23,21 @@ protected:
 
 public:
 	Motorcycle(int ID, int speed, MyRegion* region, ORD_TYPE type);
-
+	
 	static void setNormalSpeed(int ns);
 	static void setFrozenSpeed(int fs);
 	static void setVipSpeed(int vs);
 	static void printIds(Node<Motorcycle*> * current);
+	
+	void setOrder(Order* inServiceOrder);
+	Order * getOrder();
+	ORD_TYPE getMotorCycleType();
 
-	int GetID();
+	void setReturnTime(int time);
+	int getReturnTime();
 
+	int GetID();//
+	int getSpeed();
 	virtual ~Motorcycle();
 };
 
