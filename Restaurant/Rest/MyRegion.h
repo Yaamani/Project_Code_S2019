@@ -18,7 +18,12 @@ class MyRegion
 	REGION regionType;
 
 	PriorityQueue<Order*> frozen_VIP;
+	PriorityQueue<Order*> VIP;
+	Queue<Order *> frozen;
 	List<Order*> normal;
+
+	PriorityQueue<Motorcycle*> InServiceMotorcycles;
+	
 
 	Queue<Motorcycle*> fastMotorcycles;
 	Queue<Motorcycle*> frozenMotorcycles;
@@ -28,12 +33,18 @@ class MyRegion
 
 	int getNormalOrderIndexFromID(int ID);
 	
+	void assignMotorcycles(int currentTime);
+	void getReturnedMotorcycles(int currentTime);
+
 public:
 	MyRegion(REGION regionType);
 
 	// functions to add to each queue 
 	void AddToNormal(Order* order);
 	void enqueueToFrozen_VIP(Order* order, double weight = 0);
+	void enqueueToVIP(Order* order, double weight);
+	void enqueueTofrozen(Order* order);
+
 
 	void enqueueToFastMotorcycles(Motorcycle* order);
 	void enqueueToFrozenMotorcycles(Motorcycle* order);
@@ -60,4 +71,8 @@ public:
 	bool GetNormalByID(int ID, Order *& o);
 
 	void printContents();
+
+	void doAssigningStuff(int currentTime);
+	
+	
 };

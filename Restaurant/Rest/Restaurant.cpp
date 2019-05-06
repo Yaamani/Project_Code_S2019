@@ -542,3 +542,9 @@ MyRegion * Restaurant::GetMyRegion(int i)
 {
 	return regions[i];
 }
+
+void Restaurant::addToDelivered(Order * delivered)
+{
+	int FT = delivered->GetFinishTime();
+	deliveredOrders.enqueue(delivered,1/FT);
+}

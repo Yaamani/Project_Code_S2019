@@ -44,9 +44,49 @@ void Motorcycle::printIds(Node<Motorcycle*>* current)
 	std::cout << std::endl;
 }
 
+void Motorcycle::setOrder(Order * inServiceOrder)
+{
+	currentInServiceOrder = inServiceOrder;
+}
+
+Order * Motorcycle::getOrder()
+{
+	return currentInServiceOrder;
+}
+
+ORD_TYPE Motorcycle::getMotorCycleType()
+{
+	return type;
+}
+
+void Motorcycle::setReturnTime(int time)
+{
+	returnTime = time;
+}
+
+int Motorcycle::getReturnTime()
+{
+	return returnTime;
+}
+
 int Motorcycle::GetID()
 {
 	return ID;
+}
+
+int Motorcycle::getSpeed()
+{
+	switch (type){
+		case TYPE_NRM:
+			return normalSpeed;
+			break;
+		case TYPE_FROZ:
+			return frozenSpeed;
+			break;
+		case TYPE_VIP:
+			return vipSpeed;
+			break;
+	}
 }
 
 
