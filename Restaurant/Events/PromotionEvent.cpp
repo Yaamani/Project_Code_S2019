@@ -16,6 +16,7 @@ void PromotionEvent::Execute(Restaurant* pRest)
 			//pRest->getAllOrders()[OrderID] = NULL;
 			double weight = o->promoteAndReturnWeight(exMon);
 			r->enqueueToFrozen_VIP(o, weight);
+			r->enqueueToVIP(o,weight);
 			break;
 		}
 	}
