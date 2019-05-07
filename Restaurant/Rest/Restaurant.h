@@ -64,6 +64,7 @@ private:
 	void testBagADT();
 	void testPrioritizedNode();
 	void testPriorityQueue();
+	void testFileOuting();
 	void testFileLoading();
 
 	//bool phase1CancelationForTesting();
@@ -75,7 +76,7 @@ private:
 	void motorcycleshandler(int currentTimeStep);
 	bool shouldTheSimulationContinue();
 	void guiUpdate();
-	void consolePrinting();
+	void consolePrinting(int currentTimeStep);
 
 	void statusBarPrnting(int currentTimeStep);
 	void statusBarRegionInfo(string & s, char nc[], char fc[], char vc[], char motoNormC[], char motoFastC[], char motoFrC[]);
@@ -107,6 +108,7 @@ public:
 
 	//void addToDelivered(Order* delivered);
 
+	void OutFile();
 };
 
 //#endif

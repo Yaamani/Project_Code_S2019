@@ -69,6 +69,10 @@ public:
 	int getFrozenMotorcyclesCount();
 	int getFastMotorcyclesCount();
 
+	int GetDeliveredOrdersCount();
+	Order ** GetDeliverdOrdersItemArray();
+	double * GetDeliverdOrdersWeightArray();
+
 	int getInServiceVIPCount();
 	int getInServiceNormalCount();
 	int getInServiceFrozenCount();
@@ -80,4 +84,8 @@ public:
 	void handleReturnedMotorcycles(int currentTime/*, Restaurant * R_ptr*/);
 	void handleAutoPromotion(int currentTime);
 	//void doAssigningStuff(int currentTime);	
+
+	double MyRegion::getAvgWait();
+	double MyRegion::getAvgService();
+
 };
