@@ -157,6 +157,16 @@ int MyRegion::getFastMotorcyclesCount()
 	return fastMotorcycles.getSize();
 }
 
+int MyRegion::GetDeliveredOrdersCount()
+{
+	return deliveredOrders.getSize();
+}
+
+Order ** MyRegion::GetDeliverdOrdersItemArray()
+{
+	return deliveredOrders.getItemArray();
+}
+
 bool MyRegion::GetNormalByID(int ID, Order *& o)
 {
 	int index = getNormalOrderIndexFromID(ID);

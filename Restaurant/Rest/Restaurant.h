@@ -64,6 +64,7 @@ private:
 	void testBagADT();
 	void testPrioritizedNode();
 	void testPriorityQueue();
+	void testFileOuting();
 	void testFileLoading();
 
 	//bool phase1CancelationForTesting();
@@ -107,6 +108,7 @@ public:
 
 	//void addToDelivered(Order* delivered);
 
+	//void OutFile();
 };
 
 //#endif

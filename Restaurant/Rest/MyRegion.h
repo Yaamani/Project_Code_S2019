@@ -66,6 +66,9 @@ public:
 	int getFrozenMotorcyclesCount();
 	int getFastMotorcyclesCount();
 
+	int GetDeliveredOrdersCount();
+	Order ** GetDeliverdOrdersItemArray();
+
 	bool GetNormalByID(int ID, Order *& o);
 
 	void printContents();
