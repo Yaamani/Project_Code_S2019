@@ -6,17 +6,29 @@
 
 #pragma once
 
-#include "..\Defs.h"
-#include "..\CMUgraphicsLib\CMUgraphics.h"
+//#include "..\Defs.h"
+//#include "..\CMUgraphicsLib\CMUgraphics.h"
 #include "..\GUI\GUI.h"
-#include "..\Generic_DS\Queue.h"
-#include "..\Generic_DS\List.h"
-#include "..\Events\Event.h"
-#include "MyRegion.h"
-#include "Order.h"
-#include "..\Generic_DS\PriorityQueue.h"
+////#include "..\Generic_DS\Queue.h"
+//#include "..\Generic_DS\List.h"
+//#include "..\Generic_DS\PriorityQueue.h"
+////#include "..\Generic_DS\PrioritizedNode.h"
+//#include "MyRegion.h"
+//#include "Order.h"
+#include "Motorcycle.h"
+//#include "..\Events\Event.h"
+#include "..\Events\ArrivalEvent.h"
+#include "..\Events\CancelationEvent.h"
+#include "..\Events\PromotionEvent.h"
 #include <iostream>
 #include <fstream>
+#include <cstdlib>
+#include <time.h>
+#include <iostream>
+#include <string>
+
+
+class MyRegion;
 
 // it is the maestro of the project
 class Restaurant  
@@ -34,6 +46,7 @@ private:
 	// TODO: Add More Data Members As Needed
 	//
 
+
 	MyRegion* regions[REGCOUNT];
 
 	MyRegion* regionA;
@@ -41,7 +54,7 @@ private:
 	MyRegion* regionC;
 	MyRegion* regionD;
 
-	PriorityQueue<Order*> deliveredOrders;
+	//PriorityQueue<Order*> deliveredOrders;
 	
 	bool loadFiles(string path);
 	void fillOrdersGUI();
@@ -53,7 +66,19 @@ private:
 	void testPriorityQueue();
 	void testFileLoading();
 
-	bool phase1CancelationForTesting();
+	//bool phase1CancelationForTesting();
+
+	void simulation(PROG_MODE mode);
+
+	void eventExcecution(int currentTimeStep);
+	void autoPromotionHandler(int currentTimeStep);
+	void motorcycleshandler(int currentTimeStep);
+	bool shouldTheSimulationContinue();
+	void guiUpdate();
+	void consolePrinting();
+
+	void statusBarPrnting(int currentTimeStep);
+	void statusBarRegionInfo(string & s, char nc[], char fc[], char vc[], char motoNormC[], char motoFastC[], char motoFrC[]);
 
 public:
 	
@@ -75,9 +100,12 @@ public:
 	//
 
 	void Interactive();
+	void StepByStep();
+	void Silent();
+
 	MyRegion* GetMyRegion(int i);
 
-	void addToDelivered(Order* delivered);
+	//void addToDelivered(Order* delivered);
 
 };
 

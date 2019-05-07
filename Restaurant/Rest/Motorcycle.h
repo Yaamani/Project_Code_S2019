@@ -4,7 +4,11 @@
 #pragma once
 
 #include "..\Defs.h"
-#include "MyRegion.h"
+#include "..\\Generic_DS\PriorityQueue.h"
+
+class MyRegion;
+class Order;
+//class PriorityQueue<Motorcycle>;
 
 class Motorcycle	
 {
@@ -27,16 +31,17 @@ public:
 	static void setNormalSpeed(int ns);
 	static void setFrozenSpeed(int fs);
 	static void setVipSpeed(int vs);
-	static void printIds(Node<Motorcycle*> * current);
+	static void printIds(Motorcycle ** arr, int size, bool printType, bool printOrderInfo);
 	
-	void setOrder(Order* inServiceOrder);
+	void assignOrder(Order* inServiceOrder, int assignmentTime, PriorityQueue<Motorcycle*> & InServiceMotorcycles);
+	void unassignOrder();
 	Order * getOrder();
-	ORD_TYPE getMotorCycleType();
+	ORD_TYPE getMotorcycleType();
 
 	void setReturnTime(int time);
 	int getReturnTime();
 
-	int GetID();//
+	int GetID();
 	int getSpeed();
 	virtual ~Motorcycle();
 };

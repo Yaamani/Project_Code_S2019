@@ -58,13 +58,13 @@ public :
 	Queue();	
 	bool isEmpty() const ;
 	virtual bool enqueue(const T& newEntry);
-	bool dequeue(T& frntEntry);  
+	virtual bool dequeue(T& frntEntry);  
 	bool peekFront(T& frntEntry)  const;	
 
 	//void printIds();
 
 	int getSize();
-	virtual Node<T>* getFront();
+	T * getItemArray();  // [frontPtr, .......... , backPtr]
 
 	~Queue();
 };
@@ -137,7 +137,7 @@ Output: True if the operation is successful; otherwise false.
 */
 
 template <typename T>
-bool Queue<T>:: dequeue(T& frntEntry)  
+bool Queue<T>::dequeue(T& frntEntry)  
 {
 	if(isEmpty())
 		return false;
@@ -196,10 +196,22 @@ int Queue<T>::getSize()
 	return size;
 }
 
+/*
+Function: getItemArray
+[frontPtr, .......... , backPtr]
+*/
 template<typename T>
-Node<T>* Queue<T>::getFront()
+T * Queue<T>::getItemArray()
 {
-	return frontPtr;
+	Node<T>* current = frontPtr;
+	T * arr = new T[size];
+
+	for (int i = 0; current; i++) {
+		arr[i] = current->getItem();
+		current = current->getNext();
+	}
+
+	return arr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////

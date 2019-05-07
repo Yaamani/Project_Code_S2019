@@ -1,4 +1,5 @@
 #include "ArrivalEvent.h"
+#include "..\Rest\Order.h"
 
 ArrivalEvent::ArrivalEvent(int eTime, int oID, ORD_TYPE oType, MyRegion * reg, PriorityQueue<Event*> &  EventsQueue) : Event(eTime, oID, EventsQueue)
 {

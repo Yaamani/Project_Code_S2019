@@ -1,4 +1,7 @@
+#pragma once
 #include "Motorcycle.h"
+#include "MyRegion.h"
+#include "Order.h"
 
 int Motorcycle::normalSpeed = 0;
 int Motorcycle::frozenSpeed = 0;
@@ -16,6 +19,8 @@ Motorcycle::Motorcycle(int ID, int speed, MyRegion* region, ORD_TYPE type)
 	else {
 		region->enqueueToFastMotorcycles(this);
 	}
+
+	currentInServiceOrder = NULL;
 }
 
 void Motorcycle::setNormalSpeed(int ns)
@@ -33,20 +38,53 @@ void Motorcycle::setVipSpeed(int vs)
 	Motorcycle::vipSpeed = vs;
 }
 
-void Motorcycle::printIds(Node<Motorcycle*>* current)
+void Motorcycle::printIds(Motorcycle ** arr, int size, bool printType, bool printOrderInfo)
 {
-	while (current)
-	{
-		std::cout << current->getItem()->GetID() << ", ";
-		current = current->getNext();
+	for (int i = 0; i < size; i++) {
+		Motorcycle * m = arr[i];
+		if (printType) {
+			std::cout << '\n' << m->GetID() << "-";
+			switch (m->getMotorcycleType())
+			{
+			case TYPE_VIP:
+				std::cout << "FAST";
+				break;
+			case TYPE_FROZ:
+				std::cout << "FROZ";
+				break;
+			case TYPE_NRM:
+				std::cout << "NORM";
+				break;
+			}
+		} else std::cout << m->GetID();
+
+		if (m->currentInServiceOrder && printOrderInfo) {
+			Order * o = m->currentInServiceOrder;
+			o->printInfo();
+			//std::cout << ", \n";
+		}
+		std::cout << ", ";
 	}
 
 	std::cout << std::endl;
 }
 
-void Motorcycle::setOrder(Order * inServiceOrder)
+void Motorcycle::assignOrder(Order * inServiceOrder, int assignmentTime, PriorityQueue<Motorcycle*> & InServiceMotorcycles)
 {
+	status = SERV;
+
+	inServiceOrder->calculateStatistics(assignmentTime, this);
 	currentInServiceOrder = inServiceOrder;
+
+	int returnTime = assignmentTime + ceil(2 * inServiceOrder->GetServTime());
+	setReturnTime(returnTime);
+	InServiceMotorcycles.enqueue(this, 1 / returnTime);
+}
+
+void Motorcycle::unassignOrder()
+{
+	status = IDLE;
+	currentInServiceOrder = NULL;
 }
 
 Order * Motorcycle::getOrder()
@@ -54,7 +92,7 @@ Order * Motorcycle::getOrder()
 	return currentInServiceOrder;
 }
 
-ORD_TYPE Motorcycle::getMotorCycleType()
+ORD_TYPE Motorcycle::getMotorcycleType()
 {
 	return type;
 }

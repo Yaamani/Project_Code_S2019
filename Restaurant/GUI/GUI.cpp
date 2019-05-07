@@ -1,4 +1,7 @@
 #include "GUI.h"
+#include "..\Rest\Order.h"
+#include "..\Rest\MyRegion.h"
+
 
 //////////////////////////////////////////////////////////////////////////////////////////
 GUI::GUI()
@@ -58,14 +61,18 @@ string GUI::GetString() const
 // ================================== OUTPUT FUNCTIONS ===================================
 //////////////////////////////////////////////////////////////////////////////////////////
 
-void GUI::PrintMessage(string msg) const	//Prints a message on status bar
+void GUI::PrintMessage(string msg, string msg1, string msg2, string msg3, string msg4) const	//Prints a message on status bar
 {
 	ClearStatusBar();	//First clear the status bar
-	
+
 	pWind->SetPen(DARKRED);
-	pWind->SetFont(18, BOLD , BY_NAME, "Arial");   
-	pWind->DrawString(10, WindHeight - (int) (StatusBarHeight/1.5), msg); // You may need to change these coordinates later 
-	                                                                      // to be able to write multi-line
+	pWind->SetFont(18, BOLD, BY_NAME, "Arial");
+	pWind->DrawString(10, WindHeight - (int)(StatusBarHeight / (1.0 * 15 / 13)), msg); // You may need to change these coordinates later 
+																		  // to be able to write multi-line
+	pWind->DrawString(10, WindHeight - (int)(StatusBarHeight / (1.0 * 15 / 11)), msg1);
+	pWind->DrawString(10, WindHeight - (int)(StatusBarHeight / (1.0 * 5 / 3)), msg2);
+	pWind->DrawString(10, WindHeight - (int)(StatusBarHeight / (1.0 * 15 / 7)), msg3);
+	pWind->DrawString(10, WindHeight - (int)(StatusBarHeight / 3), msg4);
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 void GUI::DrawString(const int iX, const int iY, const string Text)

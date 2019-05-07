@@ -1,17 +1,16 @@
-#include <cstdlib>
-#include <time.h>
-#include <iostream>
-#include <string>
-using namespace std;
-
+#pragma once
 #include "Restaurant.h"
-#include "Motorcycle.h"
-#include "..\Events\ArrivalEvent.h"
-#include "..\Events\CancelationEvent.h"
-#include "..\Events\PromotionEvent.h"
-#include "..\Generic_DS\PrioritizedNode.h"
+#include "MyRegion.h"
+#include "Order.h"
 
+#define NOC getNormalOrdersCount()
+#define FOC getFrozenOrdersCount()
+#define VOC getVipOrdersCount()
+#define NMC getNormalMotorcyclesCount()
+#define FMC getFrozenMotorcyclesCount()
+#define VMC getFastMotorcyclesCount()
 
+using namespace std;
 
 Restaurant::Restaurant()
 {
@@ -40,7 +39,193 @@ Restaurant::Restaurant()
 void Restaurant::testFileLoading() {
 	loadFiles("test1.txt");
 
-	Event::printIds(EventsQueue.getFront());
+	Event::printIds(EventsQueue.getItemArray(), EventsQueue.getSize());
+	for (int i = 0; i < REGCOUNT; i++) {
+		regions[i]->printContents();
+	}
+}
+
+void Restaurant::simulation(PROG_MODE mode)
+{
+	for (int currentTimeStep = 0; shouldTheSimulationContinue(); currentTimeStep++)
+	{
+		if (mode == MODE_INTR)			// Interactive
+			pGUI->waitForClick();
+		else if (mode == MODE_STEP)		// Step By Step
+			Sleep(1000);
+		else if (mode == MODE_SLNT)		// Silent
+		{/*Nothing*/}				
+
+		eventExcecution(currentTimeStep);
+
+		autoPromotionHandler(currentTimeStep);
+		motorcycleshandler(currentTimeStep);
+
+		//////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////
+
+		guiUpdate();
+
+		////////////////////// Status Bar Printing //////////////////////
+		////////////////////// Status Bar Printing //////////////////////
+		////////////////////// Status Bar Printing //////////////////////
+
+		statusBarPrnting(currentTimeStep);
+
+		////////////////////// Console Printing //////////////////////
+		////////////////////// Console Printing //////////////////////
+		////////////////////// Console Printing //////////////////////
+
+		consolePrinting();
+	}
+}
+
+void Restaurant::eventExcecution(int currentTimeStep)
+{
+	if (EventsQueue.isEmpty())
+		return;
+
+	Event* x;
+	EventsQueue.peekFront(x);
+	if (x->getEventTime() == currentTimeStep) {
+		while (EventsQueue.dequeue(x)) {
+			x->Execute(this);
+			EventsQueue.peekFront(x);
+			if (x->getEventTime() != currentTimeStep)
+				break;
+		}
+	}
+}
+
+void Restaurant::motorcycleshandler(int currentTimeStep)
+{
+	for (int i = 0; i < REGCOUNT; i++) {
+		//regions[i]->doAssigningStuff(currentTimeStep);
+		regions[i]->handleReturnedMotorcycles(currentTimeStep);
+		regions[i]->assignOrdersToMotorcycles(currentTimeStep);
+	}
+}
+
+bool Restaurant::shouldTheSimulationContinue()
+{
+	bool thereAreWaitingOrders = false;
+	for (int i = 0; i < REGCOUNT; i++) {
+		if (regions[i]->isThereAnyWaitingOrder()) {
+			thereAreWaitingOrders = true;
+			break;
+		}
+	}
+
+	bool thereAreInServiceMotorcycles = false;
+	for (int i = 0; i < REGCOUNT; i++) {
+		if (regions[i]->isThereAnyInServiceMotorcycles()) {
+			thereAreInServiceMotorcycles = true;
+			break;
+		}
+	}
+
+	return !EventsQueue.isEmpty() || thereAreWaitingOrders || thereAreInServiceMotorcycles/*true*/;
+}
+
+void Restaurant::autoPromotionHandler(int currentTimeStep)
+{
+	for (int i = 0; i < REGCOUNT; i++) {
+		regions[i]->handleAutoPromotion(currentTimeStep);
+	}
+}
+
+void Restaurant::guiUpdate()
+{
+	pGUI->ResetDrawingList();
+	fillOrdersGUI();
+	pGUI->UpdateInterface();
+}
+
+void Restaurant::statusBarPrnting(int currentTimeStep)
+{
+	string statusBar = "";
+	string statusBar1 = "";
+	string statusBar2 = "";
+	string statusBar3 = "";
+	string statusBar4 = "";
+
+	char ch[10], r;
+	itoa(currentTimeStep, ch, 10);
+	statusBar.append("Time Step : ");
+	statusBar.append(ch);
+
+	int normalCount = 0, frozenCount = 0, vipCount = 0;
+	int motoNormCount = 0, motoFastCount = 0, motoFrCount = 0;
+
+	for (int i = 0; i < REGCOUNT; i++)
+	{
+		normalCount = regions[i]->NOC;
+		frozenCount = regions[i]->FOC;
+		vipCount = regions[i]->VOC;
+
+		char nC[10], fC[10], vC[10];
+		itoa(normalCount, nC, 10);
+		itoa(frozenCount, fC, 10);
+		itoa(vipCount, vC, 10);
+
+
+		motoNormCount = regions[i]->NMC;
+		motoFastCount = regions[i]->VMC;
+		motoFrCount = regions[i]->FMC;
+		
+		char motoNormC[10], motoFastC[10], motoFrC[10];
+		itoa(motoNormCount, motoNormC, 10);
+		itoa(motoFastCount, motoFastC, 10);
+		itoa(motoFrCount, motoFrC, 10);
+
+		if (i == 0)
+		{
+			statusBar1.append("Region A:   ");
+			statusBarRegionInfo(statusBar1, nC, fC, vC, motoNormC, motoFastC, motoFrC);
+		}
+		else if (i == 1)
+		{
+			statusBar2.append("Region B:   ");
+			statusBarRegionInfo(statusBar2, nC, fC, vC, motoNormC, motoFastC, motoFrC);
+		}
+		else if (i == 2)
+		{
+			statusBar3.append("Region C:   ");
+			statusBarRegionInfo(statusBar3, nC, fC, vC, motoNormC, motoFastC, motoFrC);
+		}
+		else if (i == 3)
+		{
+			statusBar4.append("Region D:   ");
+			statusBarRegionInfo(statusBar4, nC, fC, vC, motoNormC, motoFastC, motoFrC);
+		}
+
+	}
+	pGUI->PrintMessage(statusBar, statusBar1, statusBar2, statusBar3, statusBar4);
+}
+
+void Restaurant::statusBarRegionInfo(string & s, char nc[], char fc[], char vc[], char motoNormC[], char motoFastC[], char motoFrC[])
+{
+	s.append("Normal Count = ");
+	s.append(nc);
+	s.append(" | Frozen Count = ");
+	s.append(fc);
+	s.append(" | Vip Count = ");
+	s.append(vc);
+	
+	
+	s.append(" | Norm Moto Count = ");
+	s.append(motoNormC);
+	s.append(" | Froz Moto Count = ");
+	s.append(motoFrC);
+	s.append(" | Fast Moto Count = ");
+	s.append(motoFastC);
+}
+
+void Restaurant::consolePrinting()
+{
+	std::cout << "================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================" << endl;
+	Event::printIds(EventsQueue.getItemArray(), EventsQueue.getSize());
 	for (int i = 0; i < REGCOUNT; i++) {
 		regions[i]->printContents();
 	}
@@ -48,7 +233,7 @@ void Restaurant::testFileLoading() {
 
 bool Restaurant::loadFiles(string path)
 {
-	ifstream i(path);
+	ifstream i(path + ".txt");
 	if (!i.is_open()) {
 		//throw "FNF";
 		return false;
@@ -203,19 +388,19 @@ void Restaurant::testPriorityQueue()
 	Order* order4 = new Order(4, TYPE_NRM, regionA);
 
 	pq.enqueue(order0, 11);
-	Order::printIds(pq.getFront());
+	Order::printIds(pq.getItemArray(), pq.getSize());
 
 	pq.enqueue(order2, 22);
-	Order::printIds(pq.getFront());
+	Order::printIds(pq.getItemArray(), pq.getSize());
 	
 	pq.enqueue(order1, 11);
-	Order::printIds(pq.getFront());
+	Order::printIds(pq.getItemArray(), pq.getSize());
 	
 	pq.enqueue(order3, 22);
-	Order::printIds(pq.getFront());
+	Order::printIds(pq.getItemArray(), pq.getSize());
 	
 	pq.enqueue(order4, 33);
-	Order::printIds(pq.getFront());
+	Order::printIds(pq.getItemArray(), pq.getSize());
 	
 	std::cout << "Ay ha\n";
 
@@ -223,22 +408,22 @@ void Restaurant::testPriorityQueue()
 	
 	while (pq.dequeue(o))
 	{
-		Order::printIds(pq.getFront());
+		Order::printIds(pq.getItemArray(), pq.getSize());
 		std::cout << o->GetID() << std::endl;
 	}
 
 	pq.enqueue(order3, 22);
-	Order::printIds(pq.getFront());
+	Order::printIds(pq.getItemArray(), pq.getSize());
 
 	pq.enqueue(order4, 33);
-	Order::printIds(pq.getFront());
+	Order::printIds(pq.getItemArray(), pq.getSize());
 
 	pq.enqueue(order1, 11);
-	Order::printIds(pq.getFront());
+	Order::printIds(pq.getItemArray(), pq.getSize());
 
 	while (pq.dequeue(o))
 	{
-		Order::printIds(pq.getFront());
+		Order::printIds(pq.getItemArray(), pq.getSize());
 		std::cout << o->GetID() << std::endl;
 	}
 }
@@ -247,9 +432,9 @@ void Restaurant::RunSimulation()
 {
 	pGUI = new GUI;
 	
-	pGUI->PrintMessage("Please Enter File Name (Choose \"Interactive\" next) : ");
+	pGUI->PrintMessage("Please Enter File Name : ");
 	while (!loadFiles(pGUI->GetString())) {
-		pGUI->PrintMessage("File Name Was Incorrect. Enter Again (Choose \"Interactive\" next) : ");
+		pGUI->PrintMessage("File Name Was Incorrect. Enter Again : ");
 	}
 	
 	PROG_MODE	mode = pGUI->getGUIMode();
@@ -260,8 +445,10 @@ void Restaurant::RunSimulation()
 		Interactive();
 		break;
 	case MODE_STEP:
+		StepByStep();
 		break;
 	case MODE_SLNT:
+		Silent();
 		break;
 	case MODE_DEMO:
 		Just_A_Demo();
@@ -422,113 +609,44 @@ Order* Restaurant::getDemoOrder()
 
 ////////////////////////////////////////////////////////////////////
 
-bool Restaurant::phase1CancelationForTesting()
-{
-	Order* o;
-	bool allOrdersCanceled[] = { false, false, false, false };
-	for (int i = 0; i < REGCOUNT; i++) {
-		o = NULL;
-		if (!regions[i]->dequeueFrozen_VIP_PHASE_1_ONLY(o))
-			regions[i]->NormalOrdersRemoveLast(o);
-
-		if (o) 
-			delete o;
-
-		if (!regions[i]->isThereAnyOrder()) 
-			allOrdersCanceled[i] = true;
-
-		//o = NULL;
-	}
-
-	return allOrdersCanceled[0] && allOrdersCanceled[1] && allOrdersCanceled[2] && allOrdersCanceled[3];		
-}
+//bool Restaurant::phase1CancelationForTesting()
+//{
+//	Order* o;
+//	bool allOrdersCanceled[] = { false, false, false, false };
+//	for (int i = 0; i < REGCOUNT; i++) {
+//		o = NULL;
+//		if (!regions[i]->dequeueFrozen_VIP_PHASE_1_ONLY(o))
+//			regions[i]->NormalOrdersRemoveLast(o);
+//
+//		if (o) 
+//			delete o;
+//
+//		if (!regions[i]->isThereAnyWaitingOrder()) 
+//			allOrdersCanceled[i] = true;
+//
+//		//o = NULL;
+//	}
+//
+//	return allOrdersCanceled[0] && allOrdersCanceled[1] && allOrdersCanceled[2] && allOrdersCanceled[3];		
+//}
 
 /// ==> Interactive-related functions
 void Restaurant::Interactive()
 {
 	/// Advance to the next time step by a mouce click
-	/// 
-	int motoNormCount = 0, motoFastCount = 0, motoFrCount = 0;
-	for (int i = 0; i < REGCOUNT; i++) {
-		motoNormCount += regions[i]->getNormalMotorcyclesCount();
-		motoFastCount += regions[i]->getFastMotorcyclesCount();
-		motoFrCount += regions[i]->getFrozenMotorcyclesCount();
-	}
+	///
 
-	bool allOrdersCanceled_PHASE_1 = false;
-	//bool executeUpdate = false;
-	for (int CurrentTimeStep = 0; !allOrdersCanceled_PHASE_1 || !EventsQueue.isEmpty()/*true*/; CurrentTimeStep++)
-	{
-		std::cout << "================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================" << endl;
+	simulation(MODE_INTR);
+}
 
-		pGUI->waitForClick();
-		Event* x;
-		EventsQueue.peekFront(x);
-		if (x->getEventTime() == CurrentTimeStep) {
-			while (EventsQueue.dequeue(x)) {
-				x->Execute(this);
-				//executeUpdate = true;
-				EventsQueue.peekFront(x);
-				if (x->getEventTime() != CurrentTimeStep)
-					break;
-			}
-		}
-		
-		allOrdersCanceled_PHASE_1 = phase1CancelationForTesting();
+void Restaurant::StepByStep()
+{
+	simulation(MODE_STEP);
+}
 
-		//if (executeUpdate) {
-			pGUI->ResetDrawingList();
-			fillOrdersGUI();
-			pGUI->UpdateInterface();		
-			
-		//}
-		//executeUpdate = false;
-
-
-		string statusBar = "";
-		char ch[10];
-		itoa(CurrentTimeStep, ch, 10);
-		//pGUI->PrintMessage(timestep);
-		statusBar.append(ch);
-
-		int normalCount = 0, frozenCount = 0, vipCount = 0;
-		for (int i = 0; i < REGCOUNT; i++) {
-			normalCount += regions[i]->getNormalOrdersCount();
-			frozenCount += regions[i]->getFrozenOrdersCount();
-			vipCount += regions[i]->getVipOrdersCount();
-		}
-
-
-		char nC[10], fC[10], vC[10];
-		itoa(normalCount, nC, 10);
-		itoa(frozenCount, fC, 10);
-		itoa(vipCount, vC, 10);
-		statusBar.append(" | Normal Count = ");
-		statusBar.append(nC);
-		statusBar.append(" | Frozen Count = ");
-		statusBar.append(fC);
-		statusBar.append(" | Vip Count = ");
-		statusBar.append(vC);
-
-		char motoNormC[10], motoFastC[10], motoFrC[10];
-		itoa(motoNormCount, motoNormC, 10);
-		itoa(motoFastCount, motoFastC, 10);
-		itoa(motoFrCount, motoFrC, 10);
-		statusBar.append(" | Norm Moto Count = ");
-		statusBar.append(motoNormC);
-		statusBar.append(" | Froz Moto Count = ");
-		statusBar.append(motoFrC);
-		statusBar.append(" | Fast Moto Count = ");
-		statusBar.append(motoFastC);
-
-		pGUI->PrintMessage(statusBar);
-
-		Event::printIds(EventsQueue.getFront());
-		for (int i = 0; i < REGCOUNT; i++) {
-			regions[i]->printContents();
-		}
-	}
-
+void Restaurant::Silent()
+{
+	simulation(MODE_SLNT);
 }
 
 void Restaurant::fillOrdersGUI()
@@ -543,8 +661,8 @@ MyRegion * Restaurant::GetMyRegion(int i)
 	return regions[i];
 }
 
-void Restaurant::addToDelivered(Order * delivered)
-{
-	int FT = delivered->GetFinishTime();
-	deliveredOrders.enqueue(delivered,1/FT);
-}
+//void Restaurant::addToDelivered(Order * delivered)
+//{
+//	int FT = delivered->GetFinishTime();
+//	deliveredOrders.enqueue(delivered,1/FT);
+//}

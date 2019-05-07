@@ -1,4 +1,7 @@
+#pragma once
 #include "Order.h"
+#include "MyRegion.h"
+#include "Motorcycle.h"
 
 int Order::autoPromotionLimit = 0;
 
@@ -23,11 +26,11 @@ Order::Order(int ID, ORD_TYPE r_Type, MyRegion * r_region, int ArrTime, int dist
 		r_region->AddToNormal(this);
 	else if (r_Type == TYPE_VIP) {
 		double weight = calculateVipWeight();
-		r_region->enqueueToFrozen_VIP(this, weight);
+		//r_region->enqueueToFrozen_VIP(this, weight);
 		r_region->enqueueToVIP(this, weight);
 	}
 	else {
-		r_region->enqueueToFrozen_VIP(this, -DBL_MAX);
+		//r_region->enqueueToFrozen_VIP(this, -DBL_MAX);
 		r_region->enqueueTofrozen(this);
 	}
 }
@@ -112,6 +115,12 @@ int Order::GetServTime() const
 	return ServTime;
 }
 
+void Order::calculateStatistics(int assignmentTime, Motorcycle * mc)
+{
+	SetWaitTime(assignmentTime - GetArrTime());
+	SetServTime(ceil(GetDistance() / mc->getSpeed()));
+}
+
 int Order::GetFinishTime() const
 {
 	return ArrTime + WaitTime + ServTime;
@@ -124,7 +133,7 @@ int Order::GetFinishTime() const
 //	return ID == o->GetID();
 //}
 
-double Order::promoteAndReturnWeight(int promotionMoney)
+double Order::perpareForPromotionAndReturnWeight(int promotionMoney)
 {
 	if (type != TYPE_NRM) {
 		std::cout << "You're promoting a non normal order\n";
@@ -142,16 +151,35 @@ void Order::setAutoPromotionLimit(int apl)
 	Order::autoPromotionLimit = apl;
 }
 
-void Order::printIds(Node<Order*> * current)
+int Order::getAutoPromotionLimit()
 {
-	while (current)
+	return Order::autoPromotionLimit;
+}
+
+void Order::printIds(Order ** arr, int size)
+{
+	/*while (current)
 	{
 		std::cout << current->getItem()->GetID() << ", ";
 		current = current->getNext();
+	}*/
+	for (int i = 0; i < size; i++) {
+		std::cout << arr[i]->GetID() << ", ";
 	}
 
 	std::cout << std::endl;
 	//std::cout << "(size = " << size << ")" << std::endl;
+}
+
+void Order::printInfo()
+{
+	std::cout << " (oID = " << GetID()
+		<< ", Dis = " << GetDistance()
+		<< ", $ = " << GetMoney()
+		<< ", AT = " << GetArrTime()
+		<< ", WT = " << GetWaitTime()
+		<< ", ST = " << GetServTime()
+		<< ')';
 }
 
 double Order::calculateVipWeight()
