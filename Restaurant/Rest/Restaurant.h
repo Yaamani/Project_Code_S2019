@@ -68,6 +68,18 @@ private:
 
 	//bool phase1CancelationForTesting();
 
+	void simulation(PROG_MODE mode);
+
+	void eventExcecution(int currentTimeStep);
+	void autoPromotionHandler(int currentTimeStep);
+	void motorcycleshandler(int currentTimeStep);
+	bool shouldTheSimulationContinue();
+	void guiUpdate();
+	void consolePrinting();
+
+	void statusBarPrnting(int currentTimeStep);
+	void statusBarRegionInfo(string & s, char nc[], char fc[], char vc[], char motoNormC[], char motoFastC[], char motoFrC[]);
+
 public:
 	
 	Restaurant();
@@ -88,6 +100,9 @@ public:
 	//
 
 	void Interactive();
+	void StepByStep();
+	void Silent();
+
 	MyRegion* GetMyRegion(int i);
 
 	//void addToDelivered(Order* delivered);

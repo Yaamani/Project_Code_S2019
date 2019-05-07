@@ -94,8 +94,7 @@ public:
 	string GetString() const ; // reads a string (keyboard input) from the user
 
 	// Output Functions  ---------------------------
-	void PrintMessage(string msg) const; // prints a message in the status bar
-
+	void PrintMessage(string msg, string msg1 = "", string msg2 = "", string msg3 = "", string msg4 = "") const; // 
 
 	void UpdateInterface();
 	void AddOrderForDrawing(Order* pOrd);	//Adds a new order to the drawing list
