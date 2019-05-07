@@ -72,5 +72,6 @@ public:
 
 	void assignOrdersToMotorcycles(int currentTime);
 	void handleReturnedMotorcycles(int currentTime/*, Restaurant * R_ptr*/);
+	void handleAutoPromotion(int currentTime);
 	//void doAssigningStuff(int currentTime);	
 };

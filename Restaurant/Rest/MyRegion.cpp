@@ -325,6 +325,20 @@ void MyRegion::handleReturnedMotorcycles(int currentTime/*, Restaurant * R_ptr*/
 	}
 }
 
+void MyRegion::handleAutoPromotion(int currentTime)
+{
+	Node<Order *> * currentNode = normal.GetHead();
+	for (int i = 0; currentNode; i++) {
+		Order * o = currentNode->getItem();
+		currentNode = currentNode->getNext();
 
+		if (currentTime - o->GetArrTime() >= Order::getAutoPromotionLimit()) {
+			normal.Remove(i);
+
+			double w = o->perpareForPromotionAndReturnWeight(0);
+			VIP.enqueue(o, w);
+		}
+	}
+}
 
 

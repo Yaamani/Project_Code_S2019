@@ -476,6 +476,7 @@ void Restaurant::Interactive()
 		for (int i = 0; i < REGCOUNT; i++) {
 			//regions[i]->doAssigningStuff(currentTimeStep);
 
+			regions[i]->handleAutoPromotion(currentTimeStep);
 			regions[i]->handleReturnedMotorcycles(currentTimeStep);
 			regions[i]->assignOrdersToMotorcycles(currentTimeStep);
 		}
