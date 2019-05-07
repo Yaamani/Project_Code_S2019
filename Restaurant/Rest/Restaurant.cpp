@@ -32,7 +32,7 @@ Restaurant::Restaurant()
 void Restaurant::testFileLoading() {
 	loadFiles("test1.txt");
 
-	Event::printIds(EventsQueue.getFront());
+	Event::printIds(EventsQueue.getItemArray(), EventsQueue.getSize());
 	for (int i = 0; i < REGCOUNT; i++) {
 		regions[i]->printContents();
 	}
@@ -195,19 +195,19 @@ void Restaurant::testPriorityQueue()
 	Order* order4 = new Order(4, TYPE_NRM, regionA);
 
 	pq.enqueue(order0, 11);
-	Order::printIds(pq.getFront());
+	Order::printIds(pq.getItemArray(), pq.getSize());
 
 	pq.enqueue(order2, 22);
-	Order::printIds(pq.getFront());
+	Order::printIds(pq.getItemArray(), pq.getSize());
 	
 	pq.enqueue(order1, 11);
-	Order::printIds(pq.getFront());
+	Order::printIds(pq.getItemArray(), pq.getSize());
 	
 	pq.enqueue(order3, 22);
-	Order::printIds(pq.getFront());
+	Order::printIds(pq.getItemArray(), pq.getSize());
 	
 	pq.enqueue(order4, 33);
-	Order::printIds(pq.getFront());
+	Order::printIds(pq.getItemArray(), pq.getSize());
 	
 	std::cout << "Ay ha\n";
 
@@ -215,22 +215,22 @@ void Restaurant::testPriorityQueue()
 	
 	while (pq.dequeue(o))
 	{
-		Order::printIds(pq.getFront());
+		Order::printIds(pq.getItemArray(), pq.getSize());
 		std::cout << o->GetID() << std::endl;
 	}
 
 	pq.enqueue(order3, 22);
-	Order::printIds(pq.getFront());
+	Order::printIds(pq.getItemArray(), pq.getSize());
 
 	pq.enqueue(order4, 33);
-	Order::printIds(pq.getFront());
+	Order::printIds(pq.getItemArray(), pq.getSize());
 
 	pq.enqueue(order1, 11);
-	Order::printIds(pq.getFront());
+	Order::printIds(pq.getItemArray(), pq.getSize());
 
 	while (pq.dequeue(o))
 	{
-		Order::printIds(pq.getFront());
+		Order::printIds(pq.getItemArray(), pq.getSize());
 		std::cout << o->GetID() << std::endl;
 	}
 }
@@ -476,8 +476,8 @@ void Restaurant::Interactive()
 		for (int i = 0; i < REGCOUNT; i++) {
 			//regions[i]->doAssigningStuff(currentTimeStep);
 
-			regions[i]->assignOrdersToMotorcycles(currentTimeStep);
 			regions[i]->handleReturnedMotorcycles(currentTimeStep);
+			regions[i]->assignOrdersToMotorcycles(currentTimeStep);
 		}
 
 		//////////////////////
@@ -555,7 +555,7 @@ void Restaurant::Interactive()
 		////////////////////// Console Printing //////////////////////
 
 		std::cout << "================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================" << endl;
-		Event::printIds(EventsQueue.getFront());
+		Event::printIds(EventsQueue.getItemArray(), EventsQueue.getSize());
 		for (int i = 0; i < REGCOUNT; i++) {
 			regions[i]->printContents();
 		}

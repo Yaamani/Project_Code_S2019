@@ -25,7 +25,8 @@ public:
 
 	int getSize();
 	Node<T>* GetHead();
-	Node<T>** getArray();
+	Node<T>** getNodeArray();
+	T * getItemArray();
 	void deletionDoneOutside();
 
 	bool isEmpty();
@@ -167,13 +168,27 @@ Node<T>* List<T>::GetHead()
 }
 
 template<typename T>
-Node<T>** List<T>::getArray()
+Node<T>** List<T>::getNodeArray()
 {
 	Node<T>* current = head;
 	Node<T>** arr = new Node<T>*[size];
 
 	for (int i = 0; current; i++) {
 		arr[i] = current;
+		current = current->getNext();
+	}
+
+	return arr;
+}
+
+template<typename T>
+T * List<T>::getItemArray()
+{
+	Node<T>* current = head;
+	T * arr = new T[size];
+
+	for (int i = 0; current; i++) {
+		arr[i] = current->getItem();
 		current = current->getNext();
 	}
 

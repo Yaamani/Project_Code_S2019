@@ -67,10 +67,13 @@ public:
 	
 	int  GetFinishTime() const;
 
-	double promoteAndReturnWeight(int promotionMoney);
+	double perpareForPromotionAndReturnWeight(int promotionMoney);
 	
 	static void setAutoPromotionLimit(int apl);
-	static void printIds(Node<Order*> * current);
+	static int getAutoPromotionLimit();
+	static void printIds(Order ** arr, int size);
+
+	void printInfo();
 	//bool operator==(Order* o);
 };
 

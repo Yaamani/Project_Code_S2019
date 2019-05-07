@@ -11,15 +11,11 @@ public:
 
 	PrioritizedNode<T>* getFront();
 	bool enqueue(const T& newEntry, double weight = 0);
+	bool dequeue(T& frntEntry);
+	bool dequeue(T& frntEntry, double & weight);
 
 	~PriorityQueue();
 };
-
-template<typename T>
-PrioritizedNode<T>* PriorityQueue<T>::getFront()
-{
-	return dynamic_cast<PrioritizedNode<T>*>(frontPtr);
-}
 
 template<typename T>
 bool PriorityQueue<T>::enqueue(const T & newEntry, double weight)
@@ -64,6 +60,22 @@ bool PriorityQueue<T>::enqueue(const T & newEntry, double weight)
 	backPtr = newNode;
 
 	return true;
+}
+
+template<typename T>
+bool PriorityQueue<T>::dequeue(T & frntEntry)
+{
+	return Queue<T>::dequeue(frntEntry);
+}
+
+template<typename T>
+bool PriorityQueue<T>::dequeue(T & frntEntry, double & weight)
+{
+	if (isEmpty())
+		return false;
+
+	weight = dynamic_cast<PrioritizedNode<T>*>(frontPtr)->getWeight();
+	return Queue<T>::dequeue(frntEntry);
 }
 
 template<typename T>

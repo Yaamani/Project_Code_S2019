@@ -31,7 +31,7 @@ public:
 	static void setNormalSpeed(int ns);
 	static void setFrozenSpeed(int fs);
 	static void setVipSpeed(int vs);
-	static void printIds(Node<Motorcycle*> * current, bool printType, bool printOrderInfo);
+	static void printIds(Motorcycle ** arr, int size, bool printType, bool printOrderInfo);
 	
 	void assignOrder(Order* inServiceOrder, int assignmentTime, PriorityQueue<Motorcycle*> & InServiceMotorcycles);
 	void unassignOrder();

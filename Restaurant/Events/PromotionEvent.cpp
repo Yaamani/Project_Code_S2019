@@ -17,7 +17,7 @@ void PromotionEvent::Execute(Restaurant* pRest)
 		r = pRest->GetMyRegion(i);
 		if (r->ExcludeNormalOrderFromNormalListByID(OrderID, o)) {
 			//pRest->getAllOrders()[OrderID] = NULL;
-			double weight = o->promoteAndReturnWeight(exMon);
+			double weight = o->perpareForPromotionAndReturnWeight(exMon);
 			//r->enqueueToFrozen_VIP(o, weight);
 			r->enqueueToVIP(o, weight);
 			break;

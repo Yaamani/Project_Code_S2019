@@ -19,9 +19,9 @@ class MyRegion
 	REGION regionType;
 
 	//PriorityQueue<Order*> frozen_VIP;
-	PriorityQueue<Order*> VIP;
-	Queue<Order *> frozen;
-	List<Order*> normal;
+	PriorityQueue<Order*> VIP; 	//Waiting
+	Queue<Order *> frozen;		//Waiting
+	List<Order*> normal;		//Waiting
 	PriorityQueue<Order*> deliveredOrders;
 
 	PriorityQueue<Motorcycle*> InServiceMotorcycles;

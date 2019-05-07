@@ -38,11 +38,10 @@ void Motorcycle::setVipSpeed(int vs)
 	Motorcycle::vipSpeed = vs;
 }
 
-void Motorcycle::printIds(Node<Motorcycle*>* current, bool printType, bool printOrderInfo)
+void Motorcycle::printIds(Motorcycle ** arr, int size, bool printType, bool printOrderInfo)
 {
-	while (current)
-	{
-		Motorcycle * m = current->getItem();
+	for (int i = 0; i < size; i++) {
+		Motorcycle * m = arr[i];
 		if (printType) {
 			std::cout << '\n' << m->GetID() << "-";
 			switch (m->getMotorcycleType())
@@ -61,17 +60,10 @@ void Motorcycle::printIds(Node<Motorcycle*>* current, bool printType, bool print
 
 		if (m->currentInServiceOrder && printOrderInfo) {
 			Order * o = m->currentInServiceOrder;
-			std::cout << " (oID = " << o->GetID()
-				<< ", Dis = " << o->GetDistance()
-				<< ", $ = " << o->GetMoney()
-				<< ", AT = " << o->GetArrTime()
-				<< ", WT = " << o->GetWaitTime()
-				<< ", ST = " << o->GetServTime()
-				<< ')';
+			o->printInfo();
 			//std::cout << ", \n";
 		}
 		std::cout << ", ";
-		current = current->getNext();
 	}
 
 	std::cout << std::endl;

@@ -117,7 +117,6 @@ int Order::GetServTime() const
 
 void Order::calculateStatistics(int assignmentTime, Motorcycle * mc)
 {
-	
 	SetWaitTime(assignmentTime - GetArrTime());
 	SetServTime(ceil(GetDistance() / mc->getSpeed()));
 }
@@ -134,7 +133,7 @@ int Order::GetFinishTime() const
 //	return ID == o->GetID();
 //}
 
-double Order::promoteAndReturnWeight(int promotionMoney)
+double Order::perpareForPromotionAndReturnWeight(int promotionMoney)
 {
 	if (type != TYPE_NRM) {
 		std::cout << "You're promoting a non normal order\n";
@@ -152,16 +151,35 @@ void Order::setAutoPromotionLimit(int apl)
 	Order::autoPromotionLimit = apl;
 }
 
-void Order::printIds(Node<Order*> * current)
+int Order::getAutoPromotionLimit()
 {
-	while (current)
+	return Order::autoPromotionLimit;
+}
+
+void Order::printIds(Order ** arr, int size)
+{
+	/*while (current)
 	{
 		std::cout << current->getItem()->GetID() << ", ";
 		current = current->getNext();
+	}*/
+	for (int i = 0; i < size; i++) {
+		std::cout << arr[i]->GetID() << ", ";
 	}
 
 	std::cout << std::endl;
 	//std::cout << "(size = " << size << ")" << std::endl;
+}
+
+void Order::printInfo()
+{
+	std::cout << " (oID = " << GetID()
+		<< ", Dis = " << GetDistance()
+		<< ", $ = " << GetMoney()
+		<< ", AT = " << GetArrTime()
+		<< ", WT = " << GetWaitTime()
+		<< ", ST = " << GetServTime()
+		<< ')';
 }
 
 double Order::calculateVipWeight()

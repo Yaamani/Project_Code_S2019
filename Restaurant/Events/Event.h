@@ -24,7 +24,7 @@ public:
 	int GetID();
 
 	virtual void Execute(Restaurant* pRest)=0;	////a pointer to "Restaurant" and events need it to execute
-	static void printIds(Node<Event*> * current);
+	static void printIds(Event ** arr, int size);
 
 };
 

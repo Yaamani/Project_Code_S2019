@@ -30,12 +30,15 @@ int Event::GetID()
 	return getOrderID();
 }
 
-void Event::printIds(Node<Event*>* current)
+void Event::printIds(Event ** arr, int size)
 {
-	while (current)
+	/*while (current)
 	{
 		std::cout << current->getItem()->GetID() << ", ";
 		current = current->getNext();
+	}*/
+	for (int i = 0; i < size; i++) {
+		std::cout << arr[i]->GetID() << ", ";
 	}
 
 	std::cout << std::endl;

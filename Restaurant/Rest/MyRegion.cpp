@@ -56,9 +56,9 @@ bool MyRegion::isRushHour()
 	return rushHour;
 }
 
-//bool MyRegion::dequeueFrozen_VIP_PHASE_1_ONLY(Order *& o)
+//bool MyRegion::dequeueFrozen_VIP_PHASE_1_ONLY(Order *& currentNode)
 //{
-//	return frozen_VIP.dequeue(o);
+//	return frozen_VIP.dequeue(currentNode);
 //}
 
 bool MyRegion::isThereAnyWaitingOrder()
@@ -79,16 +79,36 @@ bool MyRegion::NormalOrdersRemoveLast(Order *& o)
 
 void MyRegion::addMyOrdersToDrawOrdersArr(GUI * pGUI)
 {
-	PrioritizedNode<Order*>* VipCurrent = VIP.getFront();
+	/*PrioritizedNode<Order *> * VipCurrent = VIP.getFront();
 	while (VipCurrent) {
 		pGUI->AddOrderForDrawing(VipCurrent->getItem());
 		VipCurrent = VipCurrent->getNext();
+	}*/
+	int vipSize = VIP.getSize();
+	Order ** vipOrders = new Order * [vipSize];
+	double * vipOrdersWeights = new double[vipSize];
+	for (int i = 0; i < vipSize; i++) {
+		VIP.dequeue(vipOrders[i], vipOrdersWeights[i]);
+	}
+	for (int i = 0; i < vipSize; i++) {
+		pGUI->AddOrderForDrawing(vipOrders[i]);
+		VIP.enqueue(vipOrders[i], vipOrdersWeights[i]);
 	}
 
-	Node<Order*>* frozenCurrent = frozen.getFront();
+	/*Node<Order *> * frozenCurrent = frozen.getFront();
 	while (frozenCurrent) {
 		pGUI->AddOrderForDrawing(frozenCurrent->getItem());
 		frozenCurrent = frozenCurrent->getNext();
+	}*/
+	int frozSize = frozen.getSize();
+	Order ** frozOrders = new Order *[frozSize];
+	//Order * current;
+	for (int i = 0; i < frozSize; i++) {
+		frozen.dequeue(frozOrders[frozSize - 1 - i]);
+		frozen.enqueue(frozOrders[frozSize - 1 - i]);
+	}
+	for (int i = frozSize - 1; i >= 0; i--) {
+		pGUI->AddOrderForDrawing(frozOrders[i]);
 	}
 
 	///////////////////////////////////////////////////
@@ -142,7 +162,7 @@ bool MyRegion::GetNormalByID(int ID, Order *& o)
 	int index = getNormalOrderIndexFromID(ID);
 	if (index == -1) return false;
 
-	Node<Order*>** normalList = normal.getArray();
+	Node<Order*>** normalList = normal.getNodeArray();
 
 	o = normalList[index]->getItem();
 
@@ -151,7 +171,7 @@ bool MyRegion::GetNormalByID(int ID, Order *& o)
 	//	//delete normalList[index];
 	//}
 	//else if (index == 0)
-	//	normal.Remove(o, 0);
+	//	normal.Remove(currentNode, 0);
 	//else
 	//	normalList[index - 1]->setNext(NULL);
 
@@ -178,10 +198,10 @@ bool MyRegion::ExcludeNormalOrderFromNormalListByID(int ID, Order *& o)
 	int index = getNormalOrderIndexFromID(ID);
 	if (index == -1) return false;
 
-	Node<Order*>** normalList = normal.getArray();
+	Node<Order*>** normalList = normal.getNodeArray();
 
 	o = normalList[index]->getItem();
-	//delete o;
+	//delete currentNode;
 
 	if (index > 0 && index < normal.getSize() - 1) {
 		normalList[index - 1]->setNext(normalList[index + 1]);
@@ -203,33 +223,33 @@ void MyRegion::printContents()
 	std::cout << "\n----------------------- " << regionType << " ----------------------- \n";
 
 	std::cout << "VIP = ";
-	Order::printIds(VIP.getFront());
+	Order::printIds(VIP.getItemArray(), VIP.getSize());
 
 	std::cout << "frozen = ";
-	Order::printIds(frozen.getFront());
+	Order::printIds(frozen.getItemArray(), frozen.getSize());
 
 	std::cout << "normal = ";
-	Order::printIds(normal.GetHead());
+	Order::printIds(normal.getItemArray(), normal.getSize());
 
 	std::cout << " ------------------------ \n";
 	std::cout << "delivered = ";
-	Order::printIds(deliveredOrders.getFront());
+	Order::printIds(deliveredOrders.getItemArray(), deliveredOrders.getSize());
 
 
 	std::cout << " ------------------------ \n";
 
 	std::cout << "normalMotorcycles = ";
-	Motorcycle::printIds(normalMotorcycles.getFront(), false, false);
+	Motorcycle::printIds(normalMotorcycles.getItemArray(), normalMotorcycles.getSize(), false, false);
 
 	std::cout << "frozenMotorcycles = ";
-	Motorcycle::printIds(frozenMotorcycles.getFront(), false, false);
+	Motorcycle::printIds(frozenMotorcycles.getItemArray(), frozenMotorcycles.getSize(), false, false);
 
 	std::cout << "fastMotorcycles = ";
-	Motorcycle::printIds(fastMotorcycles.getFront(), false, false);
+	Motorcycle::printIds(fastMotorcycles.getItemArray(), fastMotorcycles.getSize(), false, false);
 
 	std::cout << " ------------------------ \n";
 	std::cout << "InServiceMotorcycles = ";
-	Motorcycle::printIds(InServiceMotorcycles.getFront(), true, true);
+	Motorcycle::printIds(InServiceMotorcycles.getItemArray(), InServiceMotorcycles.getSize(), true, true);
 
 	std::cout << " __________________________________________________________ \n";
 }
@@ -304,5 +324,7 @@ void MyRegion::handleReturnedMotorcycles(int currentTime/*, Restaurant * R_ptr*/
 		InServiceMotorcycles.peekFront(mc);
 	}
 }
+
+
 
 
