@@ -9,10 +9,12 @@ class PriorityQueue :
 public:
 	//PriorityQueue();
 
-	PrioritizedNode<T>* getFront();
+	//PrioritizedNode<T>* getFront();
 	bool enqueue(const T& newEntry, double weight = 0);
 	bool dequeue(T& frntEntry);
 	bool dequeue(T& frntEntry, double & weight);
+
+	double * getWeightArray();
 
 	~PriorityQueue();
 };
@@ -76,6 +78,20 @@ bool PriorityQueue<T>::dequeue(T & frntEntry, double & weight)
 
 	weight = dynamic_cast<PrioritizedNode<T>*>(frontPtr)->getWeight();
 	return Queue<T>::dequeue(frntEntry);
+}
+
+template<typename T>
+double * PriorityQueue<T>::getWeightArray()
+{
+	PrioritizedNode<T>* current = dynamic_cast<PrioritizedNode<T>*>(frontPtr);
+	double * arr = new double[size];
+
+	for (int i = 0; current; i++) {
+		arr[i] = current->getWeight();
+		current = current->getNext();
+	}
+
+	return arr;
 }
 
 template<typename T>

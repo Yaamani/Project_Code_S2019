@@ -167,6 +167,11 @@ Order ** MyRegion::GetDeliverdOrdersItemArray()
 	return deliveredOrders.getItemArray();
 }
 
+double * MyRegion::GetDeliverdOrdersWeightArray()
+{
+	return deliveredOrders.getWeightArray();
+}
+
 bool MyRegion::GetNormalByID(int ID, Order *& o)
 {
 	int index = getNormalOrderIndexFromID(ID);
@@ -344,11 +349,46 @@ void MyRegion::handleAutoPromotion(int currentTime)
 
 		if (currentTime - o->GetArrTime() >= Order::getAutoPromotionLimit()) {
 			normal.Remove(i);
-
+			i--;
 			double w = o->perpareForPromotionAndReturnWeight(0);
 			VIP.enqueue(o, w);
 		}
 	}
 }
 
+double MyRegion::getAvgWait()
+{
+	Order ** delivered = GetDeliverdOrdersItemArray();;
+	int deliveredSize = GetDeliveredOrdersCount();
 
+	int sumOfWaitTime = 0;
+	double AvgWaitTime = 0;
+
+	for (int i = 0; i < deliveredSize; i++) {
+		sumOfWaitTime += delivered[i]->GetWaitTime();
+	}
+
+	if (sumOfWaitTime == 0)
+		return 0;
+
+	return AvgWaitTime = (double)sumOfWaitTime / (double)deliveredSize;
+}
+
+double MyRegion::getAvgService()
+{
+	Order ** delivered = GetDeliverdOrdersItemArray();;
+	int deliveredSize = GetDeliveredOrdersCount();
+
+	int sumOfServiceTime = 0;
+	double AvgServiceTime = 0;
+
+
+	for (int i = 0; i < deliveredSize; i++) {
+		sumOfServiceTime += delivered[i]->GetServTime();
+	}
+
+	if (sumOfServiceTime == 0)
+		return 0;
+
+	return AvgServiceTime = (double)sumOfServiceTime / (double)deliveredSize;
+}

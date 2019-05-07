@@ -68,6 +68,7 @@ public:
 
 	int GetDeliveredOrdersCount();
 	Order ** GetDeliverdOrdersItemArray();
+	double * GetDeliverdOrdersWeightArray();
 
 	bool GetNormalByID(int ID, Order *& o);
 
@@ -77,4 +78,8 @@ public:
 	void handleReturnedMotorcycles(int currentTime/*, Restaurant * R_ptr*/);
 	void handleAutoPromotion(int currentTime);
 	//void doAssigningStuff(int currentTime);	
+
+	double MyRegion::getAvgWait();
+	double MyRegion::getAvgService();
+
 };
