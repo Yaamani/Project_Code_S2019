@@ -299,27 +299,32 @@ void MyRegion::handleReturnedMotorcycles(int currentTime/*, Restaurant * R_ptr*/
 	InServiceMotorcycles.peekFront(mc);
 	if (InServiceMotorcycles.isEmpty())
 		return;
-
 	while (!InServiceMotorcycles.isEmpty() && mc->getReturnTime() <= currentTime) {
 		InServiceMotorcycles.dequeue(mc);
-		
-		Order * deliveredOrder;
-		deliveredOrder = mc->getOrder();
-		deliveredOrder->setDelivered(true);
-		int FT = deliveredOrder->GetFinishTime();
-		deliveredOrders.enqueue(deliveredOrder, 1 / FT);
-		
-		mc->unassignOrder();
-		switch (mc->getMotorcycleType()) {
-		case TYPE_NRM:
-			normalMotorcycles.enqueue(mc);
-			break;
-		case TYPE_FROZ:
-			frozenMotorcycles.enqueue(mc);
-			break;
-		case TYPE_VIP:
-			fastMotorcycles.enqueue(mc);
-			break;
+		if (!mc->getIsReturning()) {
+			Order * deliveredOrder;
+			deliveredOrder = mc->getOrder();
+			deliveredOrder->setDelivered(true);
+			int FT = deliveredOrder->GetFinishTime();
+			deliveredOrders.enqueue(deliveredOrder, 1 / FT);
+			int returnTime = deliveredOrder->GetServTime() + currentTime;
+			mc->unassignOrder();
+			mc->setIsReturning(true);
+			mc->setReturnTime(returnTime);
+			InServiceMotorcycles.enqueue(mc,1/returnTime);
+		}
+		else {
+			switch (mc->getMotorcycleType()) {
+				case TYPE_NRM:
+					normalMotorcycles.enqueue(mc);
+					break;
+				case TYPE_FROZ:
+					frozenMotorcycles.enqueue(mc);
+					break;
+				case TYPE_VIP:
+					fastMotorcycles.enqueue(mc);
+					break;
+			}
 		}
 		InServiceMotorcycles.peekFront(mc);
 	}
