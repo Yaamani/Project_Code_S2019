@@ -343,7 +343,7 @@ void MyRegion::handleReturnedMotorcycles(int currentTime/*, Restaurant * R_ptr*/
 			deliveredOrder = mc->getOrder();
 			deliveredOrder->setDelivered(true);
 			int FT = deliveredOrder->GetFinishTime();
-			deliveredOrders.enqueue(deliveredOrder, 1 / FT);
+			deliveredOrders.enqueue(deliveredOrder, 1.0 / (double)FT);
 			int returnTime = deliveredOrder->GetServTime() + currentTime;
 			
 			switch (deliveredOrder->GetType()) {
