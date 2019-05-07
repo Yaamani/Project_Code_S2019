@@ -8,6 +8,9 @@
 
 MyRegion::MyRegion(REGION regionType) :regionType(regionType), rushHour(false)
 {
+	inServiceFrozenCounter = 0;
+	inServiceNormalCounter = 0;
+	inServiceVipCounter = 0;
 
 }
 
@@ -157,6 +160,21 @@ int MyRegion::getFastMotorcyclesCount()
 	return fastMotorcycles.getSize();
 }
 
+int MyRegion::getInServiceVIPCount()
+{
+	return inServiceVipCounter;
+}
+
+int MyRegion::getInServiceNormalCount()
+{
+	return inServiceNormalCounter;
+}
+
+int MyRegion::getInServiceFrozenCount()
+{
+	return inServiceFrozenCounter;
+}
+
 bool MyRegion::GetNormalByID(int ID, Order *& o)
 {
 	int index = getNormalOrderIndexFromID(ID);
@@ -231,6 +249,10 @@ void MyRegion::printContents()
 	std::cout << "normal = ";
 	Order::printIds(normal.getItemArray(), normal.getSize());
 
+	std::cout << "inService VIP = "<< getInServiceVIPCount() << endl;
+	std::cout << "inService frozen = " << getInServiceFrozenCount()<< endl;
+	std::cout << "inService normal = " << getInServiceNormalCount()<< endl;
+	
 	std::cout << " ------------------------ \n";
 	std::cout << "delivered = ";
 	Order::printIds(deliveredOrders.getItemArray(), deliveredOrders.getSize());
@@ -273,21 +295,21 @@ void MyRegion::assignOrdersToMotorcycles(int currentTime)
 		if (!fastMotorcycles.dequeue(mc))
 			if (!frozenMotorcycles.dequeue(mc))
 				normalMotorcycles.dequeue(mc);
-
+		inServiceVipCounter++;
 		mc->assignOrder(currentOrder, currentTime, InServiceMotorcycles);
 	}
 	/////////////////////////// Frozen Assignment ///////////////////////////
 	while (!frozen.isEmpty() && !frozenMotorcycles.isEmpty()) {
 		frozen.dequeue(currentOrder);
 		frozenMotorcycles.dequeue(mc);
-
+		inServiceFrozenCounter++;
 		mc->assignOrder(currentOrder, currentTime, InServiceMotorcycles);
 	}
 	/////////////////////////// Normal Assignment ///////////////////////////
 	while (!normal.isEmpty() && !normalMotorcycles.isEmpty()) {
 		normal.RemoveLast(currentOrder);
 		normalMotorcycles.dequeue(mc);
-
+		inServiceNormalCounter++;
 		mc->assignOrder(currentOrder, currentTime, InServiceMotorcycles);
 	}
 }
@@ -308,6 +330,19 @@ void MyRegion::handleReturnedMotorcycles(int currentTime/*, Restaurant * R_ptr*/
 			int FT = deliveredOrder->GetFinishTime();
 			deliveredOrders.enqueue(deliveredOrder, 1 / FT);
 			int returnTime = deliveredOrder->GetServTime() + currentTime;
+			
+			switch (deliveredOrder->GetType()) {
+			case TYPE_NRM:
+				inServiceNormalCounter--;
+				break;
+			case TYPE_FROZ:
+				inServiceFrozenCounter--;
+				break;
+			case TYPE_VIP:
+				inServiceVipCounter--;
+				break;
+			}
+			
 			mc->unassignOrder();
 			mc->setIsReturning(true);
 			mc->setReturnTime(returnTime);
