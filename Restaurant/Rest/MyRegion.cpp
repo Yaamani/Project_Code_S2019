@@ -339,11 +339,12 @@ void MyRegion::handleReturnedMotorcycles(int currentTime/*, Restaurant * R_ptr*/
 	while (!InServiceMotorcycles.isEmpty() && mc->getReturnTime() <= currentTime) {
 		InServiceMotorcycles.dequeue(mc);
 		if (!mc->getIsReturning()) {
+
 			Order * deliveredOrder;
 			deliveredOrder = mc->getOrder();
 			deliveredOrder->setDelivered(true);
 			int FT = deliveredOrder->GetFinishTime();
-			deliveredOrders.enqueue(deliveredOrder, 1.0 / (double)FT);
+			deliveredOrders.enqueue(deliveredOrder, (-1000.0 * FT - deliveredOrder->GetServTime()));
 			int returnTime = deliveredOrder->GetServTime() + currentTime;
 			
 			switch (deliveredOrder->GetType()) {
