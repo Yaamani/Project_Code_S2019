@@ -76,8 +76,9 @@ void Motorcycle::assignOrder(Order * inServiceOrder, int assignmentTime, Priorit
 	inServiceOrder->calculateStatistics(assignmentTime, this);
 	currentInServiceOrder = inServiceOrder;
 
-	int returnTime = assignmentTime + ceil(2 * inServiceOrder->GetServTime());
+	int returnTime = assignmentTime + inServiceOrder->GetServTime();
 	setReturnTime(returnTime);
+	setIsReturning(false);
 	InServiceMotorcycles.enqueue(this, 1 / returnTime);
 }
 
@@ -105,6 +106,16 @@ void Motorcycle::setReturnTime(int time)
 int Motorcycle::getReturnTime()
 {
 	return returnTime;
+}
+
+void Motorcycle::setIsReturning(bool x)
+{
+	isReturning = x;
+}
+
+bool Motorcycle::getIsReturning()
+{
+	return isReturning;
 }
 
 int Motorcycle::GetID()

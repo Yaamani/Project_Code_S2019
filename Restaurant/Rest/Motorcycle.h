@@ -19,7 +19,7 @@ class Motorcycle
 	STATUS	status;	//idle or in-service
 	Order* currentInServiceOrder;
 	int returnTime;
-
+	bool isReturning;
 protected:
 	static int normalSpeed;
 	static int frozenSpeed;
@@ -40,6 +40,8 @@ public:
 
 	void setReturnTime(int time);
 	int getReturnTime();
+	void setIsReturning(bool x);
+	bool getIsReturning();
 
 	int GetID();
 	int getSpeed();
