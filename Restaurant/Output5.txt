@@ -1,0 +1,60 @@
+FT | ID | AT | WT | ST
+9    13   8    0    1
+
+9    14   8    0    1
+
+10   5    8    0    2
+
+11   15   8    0    3
+
+12   6    8    0    4
+
+12   7    8    0    4
+
+14   4    13   0    1
+
+14   2    12   0    2
+
+14   8    9    0    5
+
+15   1    12   0    3
+
+16   9    9    0    7
+
+16   16   8    0    8
+
+17   10   15   0    2
+
+18   11   15   0    3
+
+20   3    12   0    8
+
+21   17   8    8    5
+
+24   12   15   4    5
+
+*___________________________*
+Region A :
+	Orders: 4 [Norm:2,Froz1,VIP:1].
+	MotorC: 7 [Norm:3,Froz2,VIP:2].
+	Avg Wait= 0, Avg Serv= 3.5.
+*___________________________*
+Region B :
+	Orders: 5 [Norm:2,Froz0,VIP:3].
+	MotorC: 6 [Norm:3,Froz2,VIP:1].
+	Avg Wait= 0, Avg Serv= 4.4.
+*___________________________*
+Region C :
+	Orders: 4 [Norm:0,Froz3,VIP:1].
+	MotorC: 6 [Norm:2,Froz2,VIP:2].
+	Avg Wait= 1, Avg Serv= 2.75.
+*___________________________*
+Region D :
+	Orders: 4 [Norm:0,Froz1,VIP:3].
+	MotorC: 7 [Norm:4,Froz2,VIP:1].
+	Avg Wait= 2, Avg Serv= 4.25.
+*___________________________*
+For All Regions:
+	Orders: 17 [Norm:4,Froz5,VIP:8].
+	MotorC: 26 [Norm:0,Froz0,VIP:0].
+	Avg Wait= 0.75, Avg Serv= 3.725.
