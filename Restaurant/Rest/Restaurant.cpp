@@ -718,17 +718,21 @@ void Restaurant::OutFile()
 
 	Order * o;
 	while (allDeliveredOrders.dequeue(o)) {
-		out << o->GetFinishTime() << "   ";
-		if (o->GetFinishTime() < 10) out << ' ';
+		out << o->GetFinishTime() << "  ";
+		if (o->GetFinishTime() < 10) out << "  ";
+		else if (o->GetFinishTime() < 100) out << " ";
 
-		out << o->GetID() << "   ";
-		if (o->GetID() < 10) out << ' ';
+		out << o->GetID() << "  ";
+		if (o->GetID() < 10) out << "  ";
+		else if (o->GetID() < 100) out << " ";
 
-		out << o->GetArrTime() << "   ";
-		if (o->GetArrTime() < 10) out << ' ';
+		out << o->GetArrTime() << "  ";
+		if (o->GetArrTime() < 10) out << "  ";
+		else if (o->GetArrTime() < 100) out << " ";
 
-		out << o->GetWaitTime() << "   ";
-		if (o->GetWaitTime() < 10) out << ' ';
+		out << o->GetWaitTime() << "  ";
+		if (o->GetWaitTime() < 10) out << "  ";
+		else if (o->GetWaitTime() < 100) out << " ";
 
 		out << o->GetServTime() << endl << endl;
 	}
