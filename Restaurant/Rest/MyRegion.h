@@ -34,6 +34,9 @@ class MyRegion
 
 	int getNormalOrderIndexFromID(int ID);
 
+	int inServiceVipCounter;
+	int inServiceFrozenCounter;
+	int inServiceNormalCounter;
 public:
 	MyRegion(REGION regionType);
 
@@ -66,6 +69,9 @@ public:
 	int getFrozenMotorcyclesCount();
 	int getFastMotorcyclesCount();
 
+	int getInServiceVIPCount();
+	int getInServiceNormalCount();
+	int getInServiceFrozenCount();
 	bool GetNormalByID(int ID, Order *& o);
 
 	void printContents();
