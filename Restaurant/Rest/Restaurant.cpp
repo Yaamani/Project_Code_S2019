@@ -1,17 +1,9 @@
-#include <cstdlib>
-#include <time.h>
-#include <iostream>
-#include <string>
-using namespace std;
-
+#pragma once
 #include "Restaurant.h"
-#include "Motorcycle.h"
-#include "..\Events\ArrivalEvent.h"
-#include "..\Events\CancelationEvent.h"
-#include "..\Events\PromotionEvent.h"
-#include "..\Generic_DS\PrioritizedNode.h"
+#include "MyRegion.h"
+#include "Order.h"
 
-
+using namespace std;
 
 Restaurant::Restaurant()
 {
@@ -422,26 +414,26 @@ Order* Restaurant::getDemoOrder()
 
 ////////////////////////////////////////////////////////////////////
 
-bool Restaurant::phase1CancelationForTesting()
-{
-	Order* o;
-	bool allOrdersCanceled[] = { false, false, false, false };
-	for (int i = 0; i < REGCOUNT; i++) {
-		o = NULL;
-		if (!regions[i]->dequeueFrozen_VIP_PHASE_1_ONLY(o))
-			regions[i]->NormalOrdersRemoveLast(o);
-
-		if (o) 
-			delete o;
-
-		if (!regions[i]->isThereAnyOrder()) 
-			allOrdersCanceled[i] = true;
-
-		//o = NULL;
-	}
-
-	return allOrdersCanceled[0] && allOrdersCanceled[1] && allOrdersCanceled[2] && allOrdersCanceled[3];		
-}
+//bool Restaurant::phase1CancelationForTesting()
+//{
+//	Order* o;
+//	bool allOrdersCanceled[] = { false, false, false, false };
+//	for (int i = 0; i < REGCOUNT; i++) {
+//		o = NULL;
+//		if (!regions[i]->dequeueFrozen_VIP_PHASE_1_ONLY(o))
+//			regions[i]->NormalOrdersRemoveLast(o);
+//
+//		if (o) 
+//			delete o;
+//
+//		if (!regions[i]->isThereAnyWaitingOrder()) 
+//			allOrdersCanceled[i] = true;
+//
+//		//o = NULL;
+//	}
+//
+//	return allOrdersCanceled[0] && allOrdersCanceled[1] && allOrdersCanceled[2] && allOrdersCanceled[3];		
+//}
 
 /// ==> Interactive-related functions
 void Restaurant::Interactive()
@@ -455,39 +447,74 @@ void Restaurant::Interactive()
 		motoFrCount += regions[i]->getFrozenMotorcyclesCount();
 	}
 
-	bool allOrdersCanceled_PHASE_1 = false;
-	//bool executeUpdate = false;
-	for (int CurrentTimeStep = 0; !allOrdersCanceled_PHASE_1 || !EventsQueue.isEmpty()/*true*/; CurrentTimeStep++)
-	{
-		std::cout << "================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================" << endl;
+	bool thereAreWaitingOrders = true;
+	bool thereAreInServiceMotorcycles = false;
 
+	for (int currentTimeStep = 0; 
+		!EventsQueue.isEmpty() || thereAreWaitingOrders || thereAreInServiceMotorcycles/*true*/;
+		currentTimeStep++)
+	{
+		////////////////////// Events Excecution //////////////////////
+		////////////////////// Events Excecution //////////////////////
+		////////////////////// Events Excecution //////////////////////
 		pGUI->waitForClick();
 		Event* x;
 		EventsQueue.peekFront(x);
-		if (x->getEventTime() == CurrentTimeStep) {
+		if (x->getEventTime() == currentTimeStep) {
 			while (EventsQueue.dequeue(x)) {
 				x->Execute(this);
-				//executeUpdate = true;
 				EventsQueue.peekFront(x);
-				if (x->getEventTime() != CurrentTimeStep)
+				if (x->getEventTime() != currentTimeStep)
 					break;
 			}
 		}
+
+		////////////////////// Motorcycles Assignment & Auto Promotion //////////////////////
+		////////////////////// Motorcycles Assignment & Auto Promotion //////////////////////
+		////////////////////// Motorcycles Assignment & Auto Promotion //////////////////////
 		
-		allOrdersCanceled_PHASE_1 = phase1CancelationForTesting();
+		for (int i = 0; i < REGCOUNT; i++) {
+			//regions[i]->doAssigningStuff(currentTimeStep);
 
-		//if (executeUpdate) {
-			pGUI->ResetDrawingList();
-			fillOrdersGUI();
-			pGUI->UpdateInterface();		
-			
-		//}
-		//executeUpdate = false;
+			regions[i]->assignOrdersToMotorcycles(currentTimeStep);
+			regions[i]->handleReturnedMotorcycles(currentTimeStep);
+		}
 
+		//////////////////////
+		//////////////////////
+		//////////////////////
+
+		thereAreWaitingOrders = false;
+		for (int i = 0; i < REGCOUNT; i++) {
+			if (regions[i]->isThereAnyWaitingOrder()) {
+				thereAreWaitingOrders = true;
+				break;
+			}
+		}
+
+		thereAreInServiceMotorcycles = false;
+		for (int i = 0; i < REGCOUNT; i++) {
+			if (regions[i]->isThereAnyInServiceMotorcycles()) {
+				thereAreInServiceMotorcycles = true;
+				break;
+			}
+		}
+
+		//////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////
+
+		pGUI->ResetDrawingList();
+		fillOrdersGUI();
+		pGUI->UpdateInterface();		
+
+		////////////////////// Status Bar Printing //////////////////////
+		////////////////////// Status Bar Printing //////////////////////
+		////////////////////// Status Bar Printing //////////////////////
 
 		string statusBar = "";
 		char ch[10];
-		itoa(CurrentTimeStep, ch, 10);
+		itoa(currentTimeStep, ch, 10);
 		//pGUI->PrintMessage(timestep);
 		statusBar.append(ch);
 
@@ -523,6 +550,11 @@ void Restaurant::Interactive()
 
 		pGUI->PrintMessage(statusBar);
 
+		////////////////////// Console Printing //////////////////////
+		////////////////////// Console Printing //////////////////////
+		////////////////////// Console Printing //////////////////////
+
+		std::cout << "================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================" << endl;
 		Event::printIds(EventsQueue.getFront());
 		for (int i = 0; i < REGCOUNT; i++) {
 			regions[i]->printContents();
@@ -543,8 +575,8 @@ MyRegion * Restaurant::GetMyRegion(int i)
 	return regions[i];
 }
 
-void Restaurant::addToDelivered(Order * delivered)
-{
-	int FT = delivered->GetFinishTime();
-	deliveredOrders.enqueue(delivered,1/FT);
-}
+//void Restaurant::addToDelivered(Order * delivered)
+//{
+//	int FT = delivered->GetFinishTime();
+//	deliveredOrders.enqueue(delivered,1/FT);
+//}

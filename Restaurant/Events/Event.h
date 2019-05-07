@@ -6,6 +6,8 @@
 #include <iostream>
 
 class Restaurant;	//Forward declation
+class MyRegion;
+class Order;
 
 //The base class for all possible events in the system (abstract class)
 class Event

@@ -1,13 +1,14 @@
 #include "MyRegion.h"
 #include "Order.h"
-#include "Motorcycle.h"
-//#include "Restaurant.h"
-#include "..\Rest\Restaurant.h"
+#include "..\GUI\GUI.h"
+//#include "Motorcycle.h"
+#include "Restaurant.h"
+//#include "..\Rest\Restaurant.h"
 
 
-MyRegion::MyRegion(REGION regionType):regionType(regionType), rushHour(false)
+MyRegion::MyRegion(REGION regionType) :regionType(regionType), rushHour(false)
 {
-	
+
 }
 
 void MyRegion::AddToNormal(Order * order)
@@ -15,14 +16,14 @@ void MyRegion::AddToNormal(Order * order)
 	normal.insertBeg(order);
 }
 
-void MyRegion::enqueueToFrozen_VIP(Order * order, double weight)
-{
-	frozen_VIP.enqueue(order, weight); //according to weight
-}
+//void MyRegion::enqueueToFrozen_VIP(Order * order, double weight)
+//{
+//	frozen_VIP.enqueue(order, weight); //according to weight
+//}
 
 void MyRegion::enqueueToVIP(Order * order, double weight)
 {
-	VIP.enqueue(order,weight);
+	VIP.enqueue(order, weight);
 }
 
 void MyRegion::enqueueTofrozen(Order * order)
@@ -55,14 +56,20 @@ bool MyRegion::isRushHour()
 	return rushHour;
 }
 
-bool MyRegion::dequeueFrozen_VIP_PHASE_1_ONLY(Order *& o)
+//bool MyRegion::dequeueFrozen_VIP_PHASE_1_ONLY(Order *& o)
+//{
+//	return frozen_VIP.dequeue(o);
+//}
+
+bool MyRegion::isThereAnyWaitingOrder()
 {
-	return frozen_VIP.dequeue(o);
+	//return !normal.isEmpty() || !frozen_VIP.isEmpty();
+	return !normal.isEmpty() || !VIP.isEmpty() || !frozen.isEmpty();
 }
 
-bool MyRegion::isThereAnyOrder()
+bool MyRegion::isThereAnyInServiceMotorcycles()
 {
-	return !normal.isEmpty() || !frozen_VIP.isEmpty();
+	return !InServiceMotorcycles.isEmpty();
 }
 
 bool MyRegion::NormalOrdersRemoveLast(Order *& o)
@@ -72,10 +79,16 @@ bool MyRegion::NormalOrdersRemoveLast(Order *& o)
 
 void MyRegion::addMyOrdersToDrawOrdersArr(GUI * pGUI)
 {
-	PrioritizedNode<Order*>* frozenVipCurrent = frozen_VIP.getFront();
-	while (frozenVipCurrent) {
-		pGUI->AddOrderForDrawing(frozenVipCurrent->getItem());
-		frozenVipCurrent = frozenVipCurrent->getNext();
+	PrioritizedNode<Order*>* VipCurrent = VIP.getFront();
+	while (VipCurrent) {
+		pGUI->AddOrderForDrawing(VipCurrent->getItem());
+		VipCurrent = VipCurrent->getNext();
+	}
+
+	Node<Order*>* frozenCurrent = frozen.getFront();
+	while (frozenCurrent) {
+		pGUI->AddOrderForDrawing(frozenCurrent->getItem());
+		frozenCurrent = frozenCurrent->getNext();
 	}
 
 	///////////////////////////////////////////////////
@@ -189,118 +202,95 @@ void MyRegion::printContents()
 {
 	std::cout << "\n----------------------- " << regionType << " ----------------------- \n";
 
-	std::cout << "frozenVIP = ";
-	Order::printIds(frozen_VIP.getFront());
+	std::cout << "VIP = ";
+	Order::printIds(VIP.getFront());
+
+	std::cout << "frozen = ";
+	Order::printIds(frozen.getFront());
 
 	std::cout << "normal = ";
 	Order::printIds(normal.GetHead());
 
 	std::cout << " ------------------------ \n";
+	std::cout << "delivered = ";
+	Order::printIds(deliveredOrders.getFront());
+
+
+	std::cout << " ------------------------ \n";
 
 	std::cout << "normalMotorcycles = ";
-	Motorcycle::printIds(normalMotorcycles.getFront());
+	Motorcycle::printIds(normalMotorcycles.getFront(), false, false);
 
 	std::cout << "frozenMotorcycles = ";
-	Motorcycle::printIds(frozenMotorcycles.getFront());
+	Motorcycle::printIds(frozenMotorcycles.getFront(), false, false);
 
 	std::cout << "fastMotorcycles = ";
-	Motorcycle::printIds(fastMotorcycles.getFront());
-	
+	Motorcycle::printIds(fastMotorcycles.getFront(), false, false);
+
+	std::cout << " ------------------------ \n";
+	std::cout << "InServiceMotorcycles = ";
+	Motorcycle::printIds(InServiceMotorcycles.getFront(), true, true);
+
 	std::cout << " __________________________________________________________ \n";
 }
 
-void MyRegion::doAssigningStuff(int currentTime)
-{
-	assignMotorcycles(currentTime);
-	getReturnedMotorcycles(currentTime);
-}
+//void MyRegion::doAssigningStuff(int currentTime)
+//{
+//	assignOrdersToMotorcycles(currentTime);
+//	handleReturnedMotorcycles(currentTime);
+//}
 
-void MyRegion::assignMotorcycles(int currentTime)
+void MyRegion::assignOrdersToMotorcycles(int currentTime)
 {
-	while (!VIP.isEmpty()&&(!fastMotorcycles.isEmpty()||!frozenMotorcycles.isEmpty()||!normalMotorcycles.isEmpty())) {
-		Order * currentOrder;
+	Order * currentOrder;
+	Motorcycle * mc = NULL;
+	/////////////////////////// VIP Assignment ///////////////////////////
+	while (!VIP.isEmpty() && 
+		(!fastMotorcycles.isEmpty() || !frozenMotorcycles.isEmpty() || !normalMotorcycles.isEmpty())) {
+
 		VIP.dequeue(currentOrder);
-		Motorcycle * mc = NULL;
-		if (fastMotorcycles.dequeue(mc)) {
-			currentOrder->SetWaitTime(currentTime-currentOrder->GetArrTime());
-			currentOrder->SetServTime(ceil(currentOrder->GetDistance() / mc->getSpeed()));
-			mc->setOrder(currentOrder);
-			int returnTime = currentTime + ceil(2 * currentOrder->GetDistance() / mc->getSpeed());
-			mc->setReturnTime(returnTime);
-			InServiceMotorcycles.enqueue(mc,1/returnTime);
-			continue;
-		}
-		if (frozenMotorcycles.dequeue(mc)) {
-			currentOrder->SetWaitTime(currentTime - currentOrder->GetArrTime());
-			currentOrder->SetServTime(ceil(currentOrder->GetDistance() / mc->getSpeed()));
-			mc->setOrder(currentOrder);
-			int returnTime = currentTime + ceil(2 * currentOrder->GetDistance() / mc->getSpeed());
-			mc->setReturnTime(returnTime);
-			InServiceMotorcycles.enqueue(mc, 1 / returnTime);
-			continue;
-		}
-		if (normalMotorcycles.dequeue(mc)) {
-			currentOrder->SetWaitTime(currentTime - currentOrder->GetArrTime());
-			currentOrder->SetServTime(ceil(currentOrder->GetDistance() / mc->getSpeed()));
-			mc->setOrder(currentOrder);
-			int returnTime = currentTime + ceil(2 * currentOrder->GetDistance() / mc->getSpeed());
-			mc->setReturnTime(returnTime);
-			InServiceMotorcycles.enqueue(mc, 1 / returnTime);
-			continue;
-		}
+
+		if (!fastMotorcycles.dequeue(mc))
+			if (!frozenMotorcycles.dequeue(mc))
+				normalMotorcycles.dequeue(mc);
+
+		mc->assignOrder(currentOrder, currentTime, InServiceMotorcycles);
 	}
-
+	/////////////////////////// Frozen Assignment ///////////////////////////
 	while (!frozen.isEmpty() && !frozenMotorcycles.isEmpty()) {
-		Order * currentOrder;
-		Motorcycle * mc = NULL;
-
 		frozen.dequeue(currentOrder);
 		frozenMotorcycles.dequeue(mc);
-		
-		currentOrder->SetWaitTime(currentTime - currentOrder->GetArrTime());
-		currentOrder->SetServTime(ceil(currentOrder->GetDistance() / mc->getSpeed()));
-		mc->setOrder(currentOrder);
-		
-		int returnTime = currentTime + ceil(2 * currentOrder->GetDistance() / mc->getSpeed());
-		mc->setReturnTime(returnTime);
-		
-		InServiceMotorcycles.enqueue(mc, 1 / returnTime);	
-	}
 
+		mc->assignOrder(currentOrder, currentTime, InServiceMotorcycles);
+	}
+	/////////////////////////// Normal Assignment ///////////////////////////
 	while (!normal.isEmpty() && !normalMotorcycles.isEmpty()) {
-		Order * currentOrder;
-		Motorcycle * mc = NULL;
-		
 		normal.RemoveLast(currentOrder);
 		normalMotorcycles.dequeue(mc);
-		
-		currentOrder->SetWaitTime(currentTime - currentOrder->GetArrTime());
-		currentOrder->SetServTime(ceil(currentOrder->GetDistance() / mc->getSpeed()));
-		mc->setOrder(currentOrder);
-		
-		int returnTime = currentTime + ceil(2 * currentOrder->GetDistance() / mc->getSpeed());
-		mc->setReturnTime(returnTime);
 
-		InServiceMotorcycles.enqueue(mc, 1 / returnTime);
+		mc->assignOrder(currentOrder, currentTime, InServiceMotorcycles);
 	}
 }
 
-void MyRegion::getReturnedMotorcycles(int currentTime)
+void MyRegion::handleReturnedMotorcycles(int currentTime/*, Restaurant * R_ptr*/)
 {
-	Restaurant * R_ptr;
+	//Restaurant * R_ptr;
 	Motorcycle * mc;
 	InServiceMotorcycles.peekFront(mc);
 	if (InServiceMotorcycles.isEmpty())
 		return;
-	
-	while (!InServiceMotorcycles.isEmpty()&&mc->getReturnTime()<=currentTime) {
+
+	while (!InServiceMotorcycles.isEmpty() && mc->getReturnTime() <= currentTime) {
 		InServiceMotorcycles.dequeue(mc);
+		
 		Order * deliveredOrder;
 		deliveredOrder = mc->getOrder();
-		deliveredOrder->setDelivered(TRUE);
-		R_ptr->addToDelivered(deliveredOrder);
-		mc->setOrder(NULL);
-		switch (mc->getMotorCycleType()) {
+		deliveredOrder->setDelivered(true);
+		int FT = deliveredOrder->GetFinishTime();
+		deliveredOrders.enqueue(deliveredOrder, 1 / FT);
+		
+		mc->unassignOrder();
+		switch (mc->getMotorcycleType()) {
 		case TYPE_NRM:
 			normalMotorcycles.enqueue(mc);
 			break;

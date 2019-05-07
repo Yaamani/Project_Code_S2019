@@ -1,13 +1,14 @@
 #pragma once
 
 #include "..\Defs.h"
-#include "..\Generic_DS\Queue.h"
+//#include "..\Generic_DS\Queue.h"
 //#include "Order.h"
 //#include "Motorcycle.h"
 #include "..\Generic_DS\List.h"
 #include "..\Generic_DS\PriorityQueue.h"
 //#include "Restaurant.h"
 
+//class Queue;
 class Resturant;
 class Order;
 class Motorcycle;
@@ -17,34 +18,30 @@ class MyRegion
 {
 	REGION regionType;
 
-	PriorityQueue<Order*> frozen_VIP;
+	//PriorityQueue<Order*> frozen_VIP;
 	PriorityQueue<Order*> VIP;
 	Queue<Order *> frozen;
 	List<Order*> normal;
+	PriorityQueue<Order*> deliveredOrders;
 
 	PriorityQueue<Motorcycle*> InServiceMotorcycles;
-	
 
-	Queue<Motorcycle*> fastMotorcycles;
-	Queue<Motorcycle*> frozenMotorcycles;
-	Queue<Motorcycle*> normalMotorcycles;
+	Queue<Motorcycle*> fastMotorcycles;    //Available Motorcycles 
+	Queue<Motorcycle*> frozenMotorcycles;  //Available Motorcycles
+	Queue<Motorcycle*> normalMotorcycles;  //Available Motorcycles
 
 	bool rushHour;
 
 	int getNormalOrderIndexFromID(int ID);
-	
-	void assignMotorcycles(int currentTime);
-	void getReturnedMotorcycles(int currentTime);
 
 public:
 	MyRegion(REGION regionType);
 
 	// functions to add to each queue 
 	void AddToNormal(Order* order);
-	void enqueueToFrozen_VIP(Order* order, double weight = 0);
+	//void enqueueToFrozen_VIP(Order* order, double weight = 0);
 	void enqueueToVIP(Order* order, double weight);
 	void enqueueTofrozen(Order* order);
-
 
 	void enqueueToFastMotorcycles(Motorcycle* order);
 	void enqueueToFrozenMotorcycles(Motorcycle* order);
@@ -53,11 +50,12 @@ public:
 	REGION GetRegionType() const;
 	bool isRushHour();
 
-	bool dequeueFrozen_VIP_PHASE_1_ONLY(Order *& o);
+	//bool dequeueFrozen_VIP_PHASE_1_ONLY(Order *& o);
 	bool NormalOrdersRemoveLast(Order *& o);
 	bool ExcludeNormalOrderFromNormalListByID(int ID, Order *& o);
 
-	bool isThereAnyOrder();
+	bool isThereAnyWaitingOrder();
+	bool isThereAnyInServiceMotorcycles();
 
 	void addMyOrdersToDrawOrdersArr(GUI * pGUI);
 
@@ -72,7 +70,7 @@ public:
 
 	void printContents();
 
-	void doAssigningStuff(int currentTime);
-	
-	
+	void assignOrdersToMotorcycles(int currentTime);
+	void handleReturnedMotorcycles(int currentTime/*, Restaurant * R_ptr*/);
+	//void doAssigningStuff(int currentTime);	
 };

@@ -1,7 +1,10 @@
 #pragma once
 
 #include "..\Defs.h"
-#include "MyRegion.h"
+#include "..\Generic_DS\Node.h"
+
+class MyRegion;
+class Motorcycle;
 
 class Order
 {
@@ -59,6 +62,8 @@ public:
 
 	void SetServTime(int s);
 	int  GetServTime() const;
+
+	void calculateStatistics(int assignmentTime, Motorcycle * mc);
 	
 	int  GetFinishTime() const;
 

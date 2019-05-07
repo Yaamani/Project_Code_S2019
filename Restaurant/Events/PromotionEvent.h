@@ -2,11 +2,14 @@
 //#define __ARRIVAL_EVENT_H_
 #pragma once
 
-#include "..\Rest\Restaurant.h"
+//#include "..\Rest\Restaurant.h"
 #include "Event.h"
-#include "..\Rest\MyRegion.h"
+//#include "..\Rest\MyRegion.h"
+
 
 //class for the arrival event
+
+
 class PromotionEvent : public Event
 {
 	int exMon;

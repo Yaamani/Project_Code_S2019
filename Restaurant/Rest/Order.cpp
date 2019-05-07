@@ -1,4 +1,7 @@
+#pragma once
 #include "Order.h"
+#include "MyRegion.h"
+#include "Motorcycle.h"
 
 int Order::autoPromotionLimit = 0;
 
@@ -23,11 +26,11 @@ Order::Order(int ID, ORD_TYPE r_Type, MyRegion * r_region, int ArrTime, int dist
 		r_region->AddToNormal(this);
 	else if (r_Type == TYPE_VIP) {
 		double weight = calculateVipWeight();
-		r_region->enqueueToFrozen_VIP(this, weight);
+		//r_region->enqueueToFrozen_VIP(this, weight);
 		r_region->enqueueToVIP(this, weight);
 	}
 	else {
-		r_region->enqueueToFrozen_VIP(this, -DBL_MAX);
+		//r_region->enqueueToFrozen_VIP(this, -DBL_MAX);
 		r_region->enqueueTofrozen(this);
 	}
 }
@@ -110,6 +113,13 @@ void Order::SetServTime(int s)
 int Order::GetServTime() const
 {
 	return ServTime;
+}
+
+void Order::calculateStatistics(int assignmentTime, Motorcycle * mc)
+{
+	
+	SetWaitTime(assignmentTime - GetArrTime());
+	SetServTime(ceil(GetDistance() / mc->getSpeed()));
 }
 
 int Order::GetFinishTime() const

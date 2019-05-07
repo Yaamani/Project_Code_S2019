@@ -4,10 +4,12 @@
 #include "..\CMUgraphicsLib\CMUgraphics.h"
 #include "..\Defs.h"
 
-#include "..\Rest\Order.h"
 
 #include <string>
 using namespace std;
+
+class Order;
+class MyRegion;
 
 class GUI
 {
